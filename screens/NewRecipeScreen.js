@@ -1,5 +1,6 @@
 import { React, useState } from "react";
-import { Text, View, TextInput, Button, Image, StyleSheet } from "react-native";
+import { Text, View, TextInput, Button, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { Dialog } from '@rneui/themed';
 import { AntDesign } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
@@ -10,16 +11,20 @@ import { AirbnbRating } from '@rneui/themed';
 
 const categories = ["Fleisch", "Vegetarisch", "Suppe"]
 
+let imageIndex = 0;
+
 
 function NewRecipeScreen({ navigation }) {
   const [selectedCategory, setSelectedCategory] = useState();
   const [images, setImages] = useState([]);
+  const [confirmDeleteImageDialogVisible, setConfirmDeleteImageDialogVisible] = useState(false);
 
   const handleSelectImage = () => {
     launchImageLibrary({
       mediaType: "photo",
       selectionLimit: 0,
     }, (res) => {
+      console.log(res)
       const selectedImages = res.assets;
       setImages((prevImages) => [
         ...prevImages, ...selectedImages
@@ -38,6 +43,25 @@ function NewRecipeScreen({ navigation }) {
         ...prevImages, ...selectedImages
       ]);
     })
+  };
+
+  const handleRemoveImage = (index) => {
+    imageIndex = index;
+    toggleConfirmImageDeleteDialog();
+  };
+
+  const toggleConfirmImageDeleteDialog = () => {
+    setConfirmDeleteImageDialogVisible(!confirmDeleteImageDialogVisible);
+  };
+
+  const removeImage = () => {
+    setImages((prevImages) => {
+      prevImages.splice(imageIndex, 1);
+      return [
+        ...prevImages
+      ]
+    });
+    toggleConfirmImageDeleteDialog();
   };
 
   return (
@@ -100,7 +124,9 @@ function NewRecipeScreen({ navigation }) {
           }
           {
             images.map((image, index) => (
-              <Image key={index} source={{ uri: image.uri }} style={{ width: 50, height: 50 }} ></Image>
+              <TouchableOpacity key={index} onPress={() => handleRemoveImage(index)}>
+                <Image source={{ uri: image.uri }} style={{ width: 50, height: 50 }}></Image>
+              </TouchableOpacity>
             ))
           }
         </View>
@@ -133,6 +159,18 @@ function NewRecipeScreen({ navigation }) {
       <Button
         title="Rezept Hinzufügen"
       />
+
+      <Dialog
+        isVisible={confirmDeleteImageDialogVisible}
+        onBackdropPress={toggleConfirmImageDeleteDialog}
+      >
+        <Dialog.Title title="Löschen bestätigen" />
+        <Text>Ausgewähltes Bild wirklich löschen?</Text>
+        <Dialog.Actions>
+          <Dialog.Button title="Bestätigen" onPress={removeImage} />
+          <Dialog.Button title="Abbrechen" onPress={toggleConfirmImageDeleteDialog} />
+        </Dialog.Actions>
+      </Dialog>
 
     </View >
   );
