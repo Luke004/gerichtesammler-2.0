@@ -134,7 +134,8 @@ const styles = StyleSheet.create({
   },
   textInput: {
     fontSize: 20,
-    border: "1px solid black"
+    border: "1px solid black",
+    backgroundColor: "white"
   },
 });
 
