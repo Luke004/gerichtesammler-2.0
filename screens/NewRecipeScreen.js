@@ -1,18 +1,16 @@
 import { React, useState } from "react";
 import { Text, View, TextInput, Button, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Dialog } from '@rneui/themed';
-import { AntDesign } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-
+import { writeFileToStorage, getUniqueFileName } from '../util/StorageUtil';
 import { AirbnbRating } from '@rneui/themed';
 
 const categories = ["Fleisch", "Vegetarisch", "Suppe"]
 
 let imageIndex = 0;
-
 
 function NewRecipeScreen({ navigation }) {
   const [selectedCategory, setSelectedCategory] = useState();
@@ -24,7 +22,6 @@ function NewRecipeScreen({ navigation }) {
       mediaType: "photo",
       selectionLimit: 0,
     }, (res) => {
-      console.log(res)
       const selectedImages = res.assets;
       setImages((prevImages) => [
         ...prevImages, ...selectedImages
@@ -63,6 +60,25 @@ function NewRecipeScreen({ navigation }) {
     });
     toggleConfirmImageDeleteDialog();
   };
+
+  const handleAddNewRecipe = () => {
+    // save images to storage
+    saveImagesToStorage();
+
+    // create new recipe db entry
+
+    // go back to recipe list (main)
+    navigation.goBack();
+  };
+
+  const saveImagesToStorage = () => {
+    images.forEach((image) => {
+      const base64Data = image.uri.split("data:image/png;base64,");
+      const fileName = getUniqueFileName("png");
+      writeFileToStorage(base64Data, fileName);
+    });
+  };
+
 
   return (
     <View style={{ justifyContent: "flex-start", padding: 10, gap: 10 }}>
@@ -158,6 +174,7 @@ function NewRecipeScreen({ navigation }) {
 
       <Button
         title="Rezept Hinzufügen"
+        onPress={handleAddNewRecipe}
       />
 
       <Dialog
