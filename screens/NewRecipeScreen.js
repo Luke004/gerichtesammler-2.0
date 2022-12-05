@@ -95,11 +95,12 @@ function NewRecipeScreen({ navigation }) {
         </Text>
         <View style={{ flexDirection: "row", gap: 3 }}>
           {
-            images.length == 0 ? <Text style={{ paddingVertical: 5 }}>Noch keine Bilder ausgewählt!</Text> : ""
+            images.length == 0 &&
+            <Text style={{ paddingVertical: 5 }}>Noch keine Bilder ausgewählt!</Text>
           }
           {
             images.map((image, index) => (
-              <Image key={index} source={{ uri: image.uri }} style={{ width: 50, height: 50 }}  ></Image>
+              <Image key={index} source={{ uri: image.uri }} style={{ width: 50, height: 50 }} ></Image>
             ))
           }
         </View>
