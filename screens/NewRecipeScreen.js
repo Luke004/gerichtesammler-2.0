@@ -18,14 +18,25 @@ function NewRecipeScreen({ navigation }) {
   const handleSelectImage = () => {
     launchImageLibrary({
       mediaType: "photo",
-      saveToPhotos: false,
-      selectionLimit: false
+      selectionLimit: 0,
     }, (res) => {
       const selectedImages = res.assets;
       setImages((prevImages) => [
         ...prevImages, ...selectedImages
       ]);
+    })
+  };
 
+  const handleTakePhoto = () => {
+    launchCamera({
+      mediaType: "photo",
+      saveToPhotos: false,
+      selectionLimit: 0,
+    }, (res) => {
+      const selectedImages = res.assets;
+      setImages((prevImages) => [
+        ...prevImages, ...selectedImages
+      ]);
     })
   };
 
@@ -94,11 +105,11 @@ function NewRecipeScreen({ navigation }) {
         </View>
         <View style={{ flexDirection: "row", gap: 5 }}>
           <Feather name="paperclip" size={35} color="black" onPress={handleSelectImage} />
-          <Ionicons name="camera" size={35} color="black" />
+          <Ionicons name="camera" size={35} color="black" onPress={handleTakePhoto} />
         </View>
       </View>
 
-      <View style={{alignItems: "flex-start"}}>
+      <View style={{ alignItems: "flex-start" }}>
         <Text style={styles.text}>
           Bewertung
         </Text>
