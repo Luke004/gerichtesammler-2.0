@@ -4,11 +4,10 @@ import { Dialog } from '@rneui/themed';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { writeFileToStorage, getUniqueFileName } from '../util/StorageUtil';
+import { saveImagesToStorage } from '../util/StorageUtil';
 import { AirbnbRating } from '@rneui/themed';
-
 import * as ImagePicker from 'expo-image-picker';
+
 
 const categories = ["Fleisch", "Vegetarisch", "Suppe"]
 
@@ -39,7 +38,7 @@ function NewRecipeScreen({ navigation }) {
 
   const handleTakePhoto = async () => {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
-    
+
     if (!permission.granted) {
       console.log("No camera permission granted.")
       return;
@@ -51,6 +50,8 @@ function NewRecipeScreen({ navigation }) {
       quality: 0.5,
       exif: false
     });
+
+    console.log(result);
 
     if (!result.canceled) {
       setImages((prevImages) => [
@@ -78,24 +79,15 @@ function NewRecipeScreen({ navigation }) {
     toggleConfirmImageDeleteDialog();
   };
 
-  const handleAddNewRecipe = () => {
-    // save images to storage
-    saveImagesToStorage();
+  const handleAddNewRecipe = async () => {
+    saveImagesToStorage(images);
 
     // create new recipe db entry
+    // TODO:
 
     // go back to recipe list (main)
     navigation.goBack();
   };
-
-  const saveImagesToStorage = () => {
-    images.forEach((image) => {
-      const base64Data = image.uri.split("data:image/png;base64,");
-      const fileName = getUniqueFileName("png");
-      writeFileToStorage(base64Data, fileName);
-    });
-  };
-
 
   return (
     <View style={{ justifyContent: "flex-start", padding: 10, gap: 10 }}>
