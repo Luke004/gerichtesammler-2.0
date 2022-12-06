@@ -8,6 +8,8 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { writeFileToStorage, getUniqueFileName } from '../util/StorageUtil';
 import { AirbnbRating } from '@rneui/themed';
 
+import * as ImagePicker from 'expo-image-picker';
+
 const categories = ["Fleisch", "Vegetarisch", "Suppe"]
 
 let imageIndex = 0;
@@ -17,29 +19,44 @@ function NewRecipeScreen({ navigation }) {
   const [images, setImages] = useState([]);
   const [confirmDeleteImageDialogVisible, setConfirmDeleteImageDialogVisible] = useState(false);
 
-  const handleSelectImage = () => {
-    launchImageLibrary({
-      mediaType: "photo",
-      selectionLimit: 0,
-    }, (res) => {
-      const selectedImages = res.assets;
+  const handlePickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.5,
+      exif: false
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
       setImages((prevImages) => [
-        ...prevImages, ...selectedImages
+        ...prevImages, ...result.assets
       ]);
-    })
+    }
   };
 
-  const handleTakePhoto = () => {
-    launchCamera({
-      mediaType: "photo",
-      saveToPhotos: false,
-      selectionLimit: 0,
-    }, (res) => {
-      const selectedImages = res.assets;
+  const handleTakePhoto = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    
+    if (!permission.granted) {
+      console.log("No camera permission granted.")
+      return;
+    }
+
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.5,
+      exif: false
+    });
+
+    if (!result.canceled) {
       setImages((prevImages) => [
-        ...prevImages, ...selectedImages
+        ...prevImages, ...result.assets
       ]);
-    })
+    }
   };
 
   const handleRemoveImage = (index) => {
@@ -147,7 +164,7 @@ function NewRecipeScreen({ navigation }) {
           }
         </View>
         <View style={{ flexDirection: "row", gap: 5 }}>
-          <Feather name="paperclip" size={35} color="black" onPress={handleSelectImage} />
+          <Feather name="paperclip" size={35} color="black" onPress={handlePickImage} />
           <Ionicons name="camera" size={35} color="black" onPress={handleTakePhoto} />
         </View>
       </View>
