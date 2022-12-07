@@ -9,11 +9,15 @@ import HomeScreen from "./screens/HomeScreen";
 import SettingScreen from "./screens/SettingScreen";
 import UserScreen from "./screens/UserScreen";
 import NewRecipeScreen from "./screens/NewRecipeScreen";
-import { defaultPadding, iconSize } from "./const";
+import { initTables } from './util/DatabaseUtil';
+
 
 const Stack = createStackNavigator();
 
 export default function App() {
+  initTables();
+
+
   return (
     <NavigationContainer>
       <Stack.Navigator headerTitleStyle="font-weight: bold" initialRouteName="Home">
@@ -30,8 +34,8 @@ export default function App() {
             },
             headerRight: () => (
               <Ionicons name="ios-settings-outline"
-                size={iconSize}
-                style={{ paddingRight: defaultPadding }}
+                size={30}
+                style={{ paddingRight: 10 }}
                 color="#006600"
                 onPress={() => navigation.navigate('Settings')}
               />

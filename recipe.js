@@ -10,7 +10,7 @@ export class Recipe {
         this.pictures = obj.pictures != null ? obj.pictures : '';
         this.rating = obj.rating != null ? obj.rating : '';
         this.duration = obj.duration != null ? obj.duration : '';
-        this.lastCookedDate = obj.lastCookedDate != null ? obj.lastCookedDate : '';
+        this.lastCooked = obj.lastCooked != null ? obj.lastCooked : '';
     }
     */
 

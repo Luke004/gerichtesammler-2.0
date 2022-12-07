@@ -7,9 +7,12 @@ import { Picker } from '@react-native-picker/picker';
 import { saveImagesToStorage } from '../util/StorageUtil';
 import { AirbnbRating } from '@rneui/themed';
 import * as ImagePicker from 'expo-image-picker';
+import { createNewRecipe } from '../util/DatabaseUtil';
+import { Recipe } from "../recipe";
 
 
-const categories = ["Fleisch", "Vegetarisch", "Suppe"]
+const categories = ["Fleisch", "Vegetarisch", "Suppe"];
+const recipeRatingDefault = 2;
 
 let imageIndex = 0;
 
@@ -17,6 +20,12 @@ function NewRecipeScreen({ navigation }) {
   const [selectedCategory, setSelectedCategory] = useState();
   const [images, setImages] = useState([]);
   const [confirmDeleteImageDialogVisible, setConfirmDeleteImageDialogVisible] = useState(false);
+  // text input states
+  const [recipeName, setRecipeName] = useState("");
+  const [recipeInstructions, setRecipeInstructions] = useState("");
+  const [recipeDuration, setRecipeDuration] = useState(0);
+  const [recipeRating, setRecipeRating] = useState(recipeRatingDefault);
+
 
   const handlePickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -83,7 +92,16 @@ function NewRecipeScreen({ navigation }) {
     saveImagesToStorage(images);
 
     // create new recipe db entry
-    // TODO:
+    console.log("recipeName")
+    console.log(recipeName)
+    console.log("recipeInstructions")
+    console.log(recipeInstructions)
+    console.log("recipeDuration")
+    console.log(recipeDuration)
+    console.log("recipeRating")
+    console.log(recipeRating)
+    //const recipe = new Recipe("TestRecipe", "Test Instructions", 1);
+    createNewRecipe();
 
     // go back to recipe list (main)
     navigation.goBack();
@@ -95,7 +113,11 @@ function NewRecipeScreen({ navigation }) {
         <Text style={styles.text}>
           Name
         </Text>
-        <TextInput style={styles.textInput} />
+        <TextInput
+          style={styles.textInput}
+          onChangeText={(value) => setRecipeName(value)}
+          value={recipeName}
+        />
       </View>
 
       <View>
@@ -106,7 +128,10 @@ function NewRecipeScreen({ navigation }) {
           editable
           multiline
           numberOfLines={3}
-          style={styles.textInput} />
+          style={styles.textInput}
+          onChangeText={(value) => setRecipeInstructions(value)}
+          value={recipeInstructions}
+        />
       </View>
 
       <View>
@@ -135,6 +160,8 @@ function NewRecipeScreen({ navigation }) {
         <TextInput
           keyboardType="numeric"
           style={[styles.textInput, { width: "50%" }]}
+          onChangeText={(value) => setRecipeDuration(value)}
+          value={recipeDuration}
         />
       </View>
 
@@ -175,9 +202,10 @@ function NewRecipeScreen({ navigation }) {
             'Großartig',
             'Exzellent'
           ]}
-          defaultRating={2}
+          defaultRating={recipeRatingDefault}
           size={20}
           reviewSize={20}
+          onFinishRating={(number) => setRecipeRating(number)}
         />
       </View>
 
