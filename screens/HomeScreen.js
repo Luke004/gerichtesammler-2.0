@@ -31,7 +31,7 @@ function HomeScreen({ navigation }) {
     <View style={{ flex: 1, justifyContent: "flex-start" }}>
       {
         hasNoCategories &&
-        <View style={{display: "flex", flexDirection: "row", padding: 10, alignItems: "center", justifyContent: "center", alignContent: "center", gap: 15}}>
+        <View style={{ display: "flex", flexDirection: "row", padding: 10, alignItems: "center", justifyContent: "center", alignContent: "center", gap: 15 }}>
           <AntDesign name="warning" size={30} color="#e09558" />
           <Text style={{ fontWeight: "bold" }}>Sie haben noch keine Kategorien hinzugefügt. Bitte dies vor dem Hinzufügen neuer Rezepte tun.</Text>
         </View>
@@ -85,7 +85,11 @@ function HomeScreen({ navigation }) {
           right: 20,
         }}
         color="#006600"
-        onPress={() => navigation.navigate('NewRecipe')}
+        onPress={() => {
+          if (!hasNoCategories) {
+            navigation.navigate('NewRecipe');
+          }
+        }}
       />
     </View >
   );

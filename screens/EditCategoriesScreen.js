@@ -67,7 +67,6 @@ function EditCategoriesScreen({ navigation }) {
 
   const handleCategoryDelete = () => {
     const category = categories[categoryToDeleteIdx];
-
     if (!category.category_id) {
       // category was not in db yet - just remove locally
       removeCategoryFromList(categoryToDeleteIdx);
@@ -77,7 +76,6 @@ function EditCategoriesScreen({ navigation }) {
       });
     }
     setRemoveCategoryDialogVisible(false);
-    categoryToDeleteIdx = -1;
   };
 
   const removeCategoryFromList = (index) => {
@@ -151,7 +149,7 @@ function EditCategoriesScreen({ navigation }) {
         onBackdropPress={() => setRemoveCategoryDialogVisible(false)}
       >
         <Dialog.Title title="Löschen bestätigen" />
-        <Text>Kategorie "{categoryToDeleteIdx != -1 ? categories[categoryToDeleteIdx].name : ""}" wirklich löschen?</Text>
+        <Text>Kategorie "{categories[categoryToDeleteIdx] != undefined ? categories[categoryToDeleteIdx].name : ""}" wirklich löschen?</Text>
         <Dialog.Actions>
           <Dialog.Button title="Bestätigen" onPress={() => handleCategoryDelete()} />
           <Dialog.Button title="Abbrechen" onPress={() => setRemoveCategoryDialogVisible(false)} />
