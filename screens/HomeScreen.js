@@ -1,13 +1,15 @@
-import React from "react";
+import { React, useState, useEffect } from "react";
 import { Text, View, Image, ImageBackground, TouchableOpacity, TextInput, Button } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Recipe } from "../recipe";
 import { AirbnbRating, Card } from '@rneui/themed';
-
+import { hasNoCategoriesInDatabase } from '../util/DatabaseUtil'
 
 function HomeScreen({ navigation }) {
+  const [hasNoCategories, setHasNoCategories] = useState(false);
+
   const rec1 = new Recipe("Spaghetti", "Die gehen so", "category");
   rec1.lastCooked = 7;
   rec1.duration = 555;
@@ -16,9 +18,24 @@ function HomeScreen({ navigation }) {
 
   const test = [rec1, rec2];
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      hasNoCategoriesInDatabase((result) => {
+        setHasNoCategories(result);
+      });
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <View style={{ flex: 1, justifyContent: "flex-start" }}>
+      {
+        hasNoCategories &&
+        <View style={{display: "flex", flexDirection: "row", padding: 10, alignItems: "center", justifyContent: "center", alignContent: "center", gap: 15}}>
+          <AntDesign name="warning" size={30} color="#e09558" />
+          <Text style={{ fontWeight: "bold" }}>Sie haben noch keine Kategorien hinzugefügt. Bitte dies vor dem Hinzufügen neuer Rezepte tun.</Text>
+        </View>
+      }
       <View style={{ width: '100%' }}>
         {
           test.map((recipe, index) => (

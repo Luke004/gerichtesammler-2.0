@@ -55,6 +55,14 @@ export function initTables() {
         });
 }
 
+export function hasNoCategoriesInDatabase(result) {
+    db.transaction((transaction) => {
+        transaction.executeSql("SELECT count(*) FROM categories;", undefined, (res, res2) => {
+            result(res2.rows[0]["count(*)"] == 0)
+        });
+    });
+}
+
 export function getAllCategories(results) {
     db.readTransaction((transaction) => {
         transaction.executeSql("SELECT * from categories", undefined, (res, res2) => {

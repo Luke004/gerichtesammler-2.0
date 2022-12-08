@@ -4,7 +4,6 @@ import { AntDesign } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
 import ColorPicker from 'react-native-wheel-color-picker'
 import { Dialog } from '@rneui/themed';
-
 import { getAllCategories, updateCategoriesDatabase, removeCategoryFromDatabase } from '../util/DatabaseUtil'
 
 let categoryToDeleteIdx = -1;
