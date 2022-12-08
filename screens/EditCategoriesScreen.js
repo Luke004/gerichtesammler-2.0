@@ -1,58 +1,129 @@
-import { React, useState } from "react";
-import { Text, View, TextInput, Button, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { React, useState, useEffect } from "react";
+import { Text, View, TextInput, Button, Image, StyleSheet, ScrollView } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
 import ColorPicker from 'react-native-wheel-color-picker'
 import { Dialog } from '@rneui/themed';
 
-function EditCategoriesScreen({ navigation }) {
-  const [colorPickerVisible, setColorPickerVisible] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState();
-  const [selectedColor, setSelectedColor] = useState();
+import { getAllCategories, updateCategoriesDatabase, removeCategoryFromDatabase } from '../util/DatabaseUtil'
 
-  const categories = [{ id: 1, name: "myCategory1", color: "#74eb34" }, { id: 2, name: "myCategory2", color: "#eb8634" }]
+let categoryToDeleteIdx = -1;
+let categoryToChangeColorIdx = -1;
+
+let categoriesReference;
+
+function EditCategoriesScreen({ navigation }) {
+  const [categories, setCategories] = useState([]);
+  const [colorPickerVisible, setColorPickerVisible] = useState(false);
+  const [removeCategoryDialogVisible, setRemoveCategoryDialogVisible] = useState(false);
+  const [selectedColor, setSelectedColor] = useState();
+  const [nameChange, setNameChange] = useState({});
+  categoriesReference = categories;
+
+  useEffect(() => {
+    getAllCategories((results) => {
+      setCategories(results);
+    })
+  }, []);
+
+  useEffect(() => {
+    // this listener is called when user leaves this screen
+    const unsubscribe = navigation.addListener('beforeRemove', () => {
+      // for some reason state 'categories' is empty here so we use a reference to it which still has them
+      updateCategoriesDatabase(categoriesReference);
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   const addNewCategory = () => {
-
+    setCategories((prevCategories) => {
+      const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
+      prevCategories.push({ id: Math.random(), name: "Kategorie " + (prevCategories.length + 1), color: randomColor });
+      return [...prevCategories]
+    });
   };
 
-  const handleColorPickerPress = (category) => {
+  const handleColorPickerPress = (category, index) => {
+    categoryToChangeColorIdx = index;
     setSelectedColor(category.color)
-    setSelectedCategory(category)
     setColorPickerVisible(true);
   };
 
-  const handleCategoryColorChange = (color) => {
+  const handleChangeColor = (color) => {
+    categories[categoryToChangeColorIdx].wasChanged = true;
     setSelectedColor(color);
-    selectedCategory.color = color;
+    categories[categoryToChangeColorIdx].color = color;
+  };
+
+  const handleChangeText = (value, index) => {
+    categories[index].wasChanged = true;
+    setNameChange(value);
+    categories[index].name = value;
+  };
+
+  const handleCategoryDeletePress = (index) => {
+    categoryToDeleteIdx = index;
+    setRemoveCategoryDialogVisible(true);
+  };
+
+  const handleCategoryDelete = () => {
+    const category = categories[categoryToDeleteIdx];
+
+    if (!category.category_id) {
+      // category was not in db yet - just remove locally
+      removeCategoryFromList(categoryToDeleteIdx);
+    } else {
+      removeCategoryFromDatabase(category, () => {
+        removeCategoryFromList(categoryToDeleteIdx);
+      });
+    }
+    setRemoveCategoryDialogVisible(false);
+    categoryToDeleteIdx = -1;
+  };
+
+  const removeCategoryFromList = (index) => {
+    setCategories((prevCategories) => {
+      prevCategories.splice(index, 1);
+      return [...prevCategories]
+    });
   };
 
   return (
+    <View style={{ display: "flex", flex: 1, justifyContent: "flex-start" }}>
 
-    <View style={{ flex: 1, justifyContent: "flex-start", padding: 5 }}>
-
-      <View style={{ width: '100%', gap: 4 }}>
+      <ScrollView style={{ flexBasis: 0 }}>
         {
           categories.map((category, index) => (
-            <View key={index} style={{ display: "flex", flexDirection: "row", justifyContent: "flex-start" }}>
+            <View key={index} style={{ display: "flex", flexDirection: "row", justifyContent: "flex-start", marginBottom: 1 }}>
               <TextInput
                 style={styles.textInput}
                 value={category.name}
+                onChangeText={(value) => handleChangeText(value, index)}
               />
               <View
                 style={{
                   flex: 1,
                   alignItems: "center",
                   justifyContent: "center",
-                  backgroundColor: selectedCategory && (category.id == selectedCategory.id) ? selectedColor : category.color
+                  backgroundColor: category.color
                 }}>
-                <Entypo name="round-brush" size={24} color="black" onPress={() => handleColorPickerPress(category)} />
+                <Entypo name="round-brush" size={24} color="black" onPress={() => handleColorPickerPress(category, index)} />
+              </View>
+
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "white"
+                }}>
+                <AntDesign name="delete" size={24} color="black" onPress={() => handleCategoryDeletePress(index)} />
               </View>
             </View>
 
           ))
         }
-      </View>
+      </ScrollView>
 
       <Dialog
         isVisible={colorPickerVisible}
@@ -63,7 +134,7 @@ function EditCategoriesScreen({ navigation }) {
         </View>
         <ColorPicker
           color={selectedColor}
-          onColorChangeComplete={(color) => handleCategoryColorChange(color)}
+          onColorChangeComplete={(color) => handleChangeColor(color)}
           thumbSize={40}
           sliderSize={40}
           noSnap={true}
@@ -74,10 +145,19 @@ function EditCategoriesScreen({ navigation }) {
         <View style={{ justifyContent: "center", marginTop: 20 }}>
           <Dialog.Button title="FERTIG" onPress={() => setColorPickerVisible(false)} />
         </View>
-
       </Dialog>
 
-
+      <Dialog
+        isVisible={removeCategoryDialogVisible}
+        onBackdropPress={() => setRemoveCategoryDialogVisible(false)}
+      >
+        <Dialog.Title title="Löschen bestätigen" />
+        <Text>Kategorie "{categoryToDeleteIdx != -1 ? categories[categoryToDeleteIdx].name : ""}" wirklich löschen?</Text>
+        <Dialog.Actions>
+          <Dialog.Button title="Bestätigen" onPress={() => handleCategoryDelete()} />
+          <Dialog.Button title="Abbrechen" onPress={() => setRemoveCategoryDialogVisible(false)} />
+        </Dialog.Actions>
+      </Dialog>
 
       <AntDesign name="pluscircleo"
         size={70}
@@ -87,7 +167,7 @@ function EditCategoriesScreen({ navigation }) {
           right: 20,
         }}
         color="#006600"
-        onPress={() => addNewCategory}
+        onPress={() => addNewCategory()}
       />
 
     </View >
@@ -96,7 +176,7 @@ function EditCategoriesScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   textInput: {
-    flex: 3,
+    flex: 4,
     fontSize: 20,
     backgroundColor: "white",
     padding: 10

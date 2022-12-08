@@ -80,9 +80,7 @@ function NewRecipeScreen({ navigation }) {
   const removeImage = () => {
     setImages((prevImages) => {
       prevImages.splice(imageIndex, 1);
-      return [
-        ...prevImages
-      ]
+      return [...prevImages]
     });
     toggleConfirmImageDeleteDialog();
   };

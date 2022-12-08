@@ -6,7 +6,8 @@ const db = openDatabase('myDb', "1.0");
 export function initTables() {
     const createTableCategory = `CREATE TABLE IF NOT EXISTS categories (
         category_id INTEGER PRIMARY KEY,
-        name TINYTEXT NOT NULL
+        name TINYTEXT NOT NULL,
+        color TINYTEXT NOT NULL
       );`
 
     const createTableRecipe = `CREATE TABLE IF NOT EXISTS recipes (
@@ -54,7 +55,50 @@ export function initTables() {
         });
 }
 
+export function getAllCategories(results) {
+    db.readTransaction((transaction) => {
+        transaction.executeSql("SELECT * from categories", undefined, (res, res2) => {
+            const rows = res2.rows;
+            const arr = [];
+            for (let i = 0; i < rows.length; ++i) {
+                arr.push(rows[i]);
+            }
+            results(arr)
+        });
+    },
+        (error) => {
+            console.log(error);
+        });
+}
+
+export function updateCategoriesDatabase(categories) {
+    categories.forEach((category) => {
+        if (!category.wasChanged) {
+            return;
+        }
+
+        const existsCategory = category.category_id != undefined;
+        if (!existsCategory) {
+            // add new category
+            db.transaction((transaction) => {
+                transaction.executeSql("INSERT INTO categories (name, color) VALUES(?, ?);", [category.name, category.color]);
+            });
+        } else {
+            // update category
+            db.transaction((transaction) => {
+                transaction.executeSql("UPDATE categories SET name = ?, color = ? WHERE category_id = ?;", [category.name, category.color, category.category_id]);
+            });
+        }
+    });
+}
+
+export function removeCategoryFromDatabase(category, success) {
+    db.transaction((transaction) => {
+        transaction.executeSql("DELETE FROM categories WHERE category_id = ?;", [category.category_id], success());
+    });
+}
+
 export function createNewRecipe(recipe) {
-    
+
 }
 

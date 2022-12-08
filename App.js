@@ -18,7 +18,7 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator headerTitleStyle="font-weight: bold" initialRouteName="EditCategories">
+      <Stack.Navigator headerTitleStyle="font-weight: bold" initialRouteName="Home">
         <Stack.Screen
           name="Home"
           component={HomeScreen}
@@ -40,11 +40,15 @@ export default function App() {
             ),
           })}
         />
-        <Stack.Screen name="Settings" component={SettingScreen} />
-        <Stack.Screen name="EditCategories" component={EditCategoriesScreen} 
-         options = {{
-          title: "Katgorien bearbeiten"
-         }}
+        <Stack.Screen name="Settings" component={SettingScreen}
+          options={{
+            title: "Konfiguration"
+          }}
+        />
+        <Stack.Screen name="EditCategories" component={EditCategoriesScreen}
+          options={{
+            title: "Katgorien bearbeiten"
+          }}
         />
         <Stack.Screen
           name="NewRecipe"

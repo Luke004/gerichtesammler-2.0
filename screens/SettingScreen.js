@@ -1,14 +1,13 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { Text, View, Button } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-  
-const Settings = () => {
+
+const Settings = ({ navigation }) => {
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text style={{ color: "#006600", fontSize: 40 }}>Settings Screen!</Text>
-      <Ionicons name="ios-settings-outline" size={80} color="#006600" />
+    <View style={{ flex: 1 }}>
+      <Button title="Kategorien bearbeiten" onPress={() => navigation.navigate('EditCategories')}></Button>
     </View>
   );
 };
-  
+
 export default Settings;
