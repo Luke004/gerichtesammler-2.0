@@ -3,11 +3,10 @@ import { Button, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from "@react-navigation/stack";
 import { Ionicons } from "@expo/vector-icons";
-
-
 import HomeScreen from "./screens/HomeScreen";
 import SettingScreen from "./screens/SettingScreen";
 import UserScreen from "./screens/UserScreen";
+import EditCategoriesScreen from "./screens/EditCategoriesScreen";
 import NewRecipeScreen from "./screens/NewRecipeScreen";
 import { initTables } from './util/DatabaseUtil';
 
@@ -17,10 +16,9 @@ const Stack = createStackNavigator();
 export default function App() {
   initTables();
 
-
   return (
     <NavigationContainer>
-      <Stack.Navigator headerTitleStyle="font-weight: bold" initialRouteName="Home">
+      <Stack.Navigator headerTitleStyle="font-weight: bold" initialRouteName="EditCategories">
         <Stack.Screen
           name="Home"
           component={HomeScreen}
@@ -43,6 +41,11 @@ export default function App() {
           })}
         />
         <Stack.Screen name="Settings" component={SettingScreen} />
+        <Stack.Screen name="EditCategories" component={EditCategoriesScreen} 
+         options = {{
+          title: "Katgorien bearbeiten"
+         }}
+        />
         <Stack.Screen
           name="NewRecipe"
           options={({ navigation }) => ({

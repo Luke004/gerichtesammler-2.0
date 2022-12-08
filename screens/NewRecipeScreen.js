@@ -14,11 +14,10 @@ import { Recipe } from "../recipe";
 const categories = ["Fleisch", "Vegetarisch", "Suppe"];
 const recipeRatingDefault = 2;
 
-let imageIndex = 0;
-
 function NewRecipeScreen({ navigation }) {
   const [selectedCategory, setSelectedCategory] = useState();
   const [images, setImages] = useState([]);
+  const [imageIndex, setImageIndex] = useState([]);
   const [confirmDeleteImageDialogVisible, setConfirmDeleteImageDialogVisible] = useState(false);
   // text input states
   const [recipeName, setRecipeName] = useState("");
@@ -70,7 +69,7 @@ function NewRecipeScreen({ navigation }) {
   };
 
   const handleRemoveImage = (index) => {
-    imageIndex = index;
+    setImageIndex(index);
     toggleConfirmImageDeleteDialog();
   };
 
@@ -100,8 +99,8 @@ function NewRecipeScreen({ navigation }) {
     console.log(recipeDuration)
     console.log("recipeRating")
     console.log(recipeRating)
-    //const recipe = new Recipe("TestRecipe", "Test Instructions", 1);
-    createNewRecipe();
+    const recipe = new Recipe(recipeName, recipeInstructions, 1);
+    createNewRecipe(recipe);
 
     // go back to recipe list (main)
     navigation.goBack();
