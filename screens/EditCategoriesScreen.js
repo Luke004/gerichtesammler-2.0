@@ -145,17 +145,20 @@ function EditCategoriesScreen({ navigation }) {
         <View style={{ marginBottom: 20 }}>
           <Dialog.Title title="Farbe wählen" />
         </View>
-        <ColorPicker
-          color={selectedColor}
-          onColorChangeComplete={(color) => handleChangeColor(color)}
-          thumbSize={40}
-          sliderSize={40}
-          noSnap={true}
-          gapSize={10}
-          row={false}
-          swatchesLast={false}
-        />
-        <View style={{ justifyContent: "center", marginTop: 20 }}>
+        <View style={{height: 300}}>
+          <ColorPicker
+            color={selectedColor}
+            onColorChangeComplete={(color) => handleChangeColor(color)}
+            thumbSize={40}
+            sliderSize={40}
+            noSnap={true}
+            gapSize={10}
+            row={false}
+            swatchesLast={false}
+          />
+        </View>
+
+        <View style={{ display: "flex", justifyContent: "center", marginTop: 20 }}>
           <Dialog.Button title="FERTIG" onPress={() => setColorPickerVisible(false)} />
         </View>
       </Dialog>
