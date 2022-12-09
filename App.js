@@ -5,7 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Ionicons } from "@expo/vector-icons";
 import HomeScreen from "./screens/HomeScreen";
 import SettingScreen from "./screens/SettingScreen";
-import UserScreen from "./screens/UserScreen";
+import RecipeDetailScreen from "./screens/RecipeDetailScreen";
 import EditCategoriesScreen from "./screens/EditCategoriesScreen";
 import NewRecipeScreen from "./screens/NewRecipeScreen";
 import { initTables } from './util/DatabaseUtil';
@@ -63,7 +63,7 @@ export default function App() {
           })}
           component={NewRecipeScreen}
         />
-        <Stack.Screen name="User" component={UserScreen} />
+        <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen}></Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );

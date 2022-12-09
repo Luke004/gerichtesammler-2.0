@@ -1,5 +1,5 @@
-export function getLastCookedInfo(lastCooked) {
-    if (!lastCooked) return "-"
+export function getLastCookedInfo(lastCooked, detailed = false) {
+    if (!lastCooked) return detailed ? "noch nie" : "-";
 
     if (lastCooked == 1) {
         return "gestern";
@@ -20,7 +20,7 @@ export function getLastCookedInfo(lastCooked) {
         return "vor " + Math.floor(lastCooked / 365) + (years == 1 ? " Jahr" : " Jahren");
     }
 
-    return "-"
+    return "-";
 }
 
 export function getDurationInfo(duration) {

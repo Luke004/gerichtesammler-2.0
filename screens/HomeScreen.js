@@ -1,8 +1,6 @@
 import { React, useState, useEffect } from "react";
-import { Text, View, ImageBackground, ScrollView } from "react-native";
-import { AntDesign } from '@expo/vector-icons';
-import { Ionicons } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Text, View, ImageBackground, ScrollView, TouchableOpacity } from "react-native";
+import { AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { AirbnbRating, Card } from '@rneui/themed';
 import { getDurationInfo, getLastCookedInfo } from "../util/RecipeUtil";
 import { getAllRecipes, getCategoryColorById, hasNoCategoriesInDatabase } from '../util/DatabaseUtil'
@@ -13,7 +11,6 @@ function HomeScreen({ navigation }) {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      console.log("FOCUS")
       hasNoCategoriesInDatabase((result) => {
         setHasNoCategories(result);
       });
@@ -47,41 +44,48 @@ function HomeScreen({ navigation }) {
       <ScrollView style={{ width: '100%', flexBasis: 0 }}>
         {
           recipes.map((recipe, index) => (
-            <Card key={recipe.recipe_id} containerStyle={{ margin: 0, paddingVertical: 7, paddingHorizontal: 15, backgroundColor: "white" }}>
-              <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <View style={{ flexShrink: 1 }}>
-                  <ImageBackground source={require('../assets/test.png')} resizeMode="stretch"
-                    imageStyle={{ tintColor: recipe.categoryColor ? recipe.categoryColor : "orange", opacity: 0.8 }}>
-                    <Text style={{ fontWeight: "bold", fontSize: 16, padding: 8 }}>{recipe.name}</Text>
-                  </ImageBackground>
+            <TouchableOpacity key={recipe.recipe_id}
+              onPress={() => navigation.navigate('RecipeDetail', { recipe: recipe })}
+              onLongPress={() => console.log("Long press")}
+            >
+              <Card containerStyle={{
+                margin: 0, paddingVertical: 7, paddingHorizontal: 15, backgroundColor: "white"
+              }}>
+                <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
+                  <View style={{ flexShrink: 1 }}>
+                    <ImageBackground source={require('../assets/backgrounds/pencil-draw.png')} resizeMode="stretch"
+                      imageStyle={{ tintColor: recipe.categoryColor ? recipe.categoryColor : "orange", opacity: 0.8 }}>
+                      <Text style={{ fontWeight: "bold", fontSize: 16, padding: 8 }}>{recipe.name}</Text>
+                    </ImageBackground>
+                  </View>
+                  <AirbnbRating
+                    count={5}
+                    reviews={[
+                      'Okay',
+                      'Good',
+                      'Tasty',
+                      'Great',
+                      'Excellent'
+                    ]}
+                    defaultRating={recipe.rating}
+                    size={10}
+                    reviewSize={12}
+                    showRating={false}
+                    isDisabled={true}
+                  />
                 </View>
-                <AirbnbRating
-                  count={5}
-                  reviews={[
-                    'Okay',
-                    'Good',
-                    'Tasty',
-                    'Great',
-                    'Excellent'
-                  ]}
-                  defaultRating={recipe.rating}
-                  size={10}
-                  reviewSize={12}
-                  showRating={false}
-                  isDisabled={true}
-                />
-              </View>
-              <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", marginTop: 15 }}>
-                <View style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 3 }}>
-                  <Ionicons name="time" size={24} color="black" />
-                  <Text>{getDurationInfo(recipe.duration)}</Text>
+                <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", marginTop: 15 }}>
+                  <View style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 3 }}>
+                    <Ionicons name="time" size={24} color="black" />
+                    <Text>{getDurationInfo(recipe.duration)}</Text>
+                  </View>
+                  <View style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "flex-end", gap: 3 }}>
+                    <MaterialCommunityIcons name="silverware-fork-knife" size={24} color="black" />
+                    <Text>{getLastCookedInfo(recipe.lastCooked)}</Text>
+                  </View>
                 </View>
-                <View style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "flex-end", gap: 3 }}>
-                  <MaterialCommunityIcons name="silverware-fork-knife" size={24} color="black" />
-                  <Text>{getLastCookedInfo(recipe.lastCooked)}</Text>
-                </View>
-              </View>
-            </Card>
+              </Card>
+            </TouchableOpacity>
           ))
         }
       </ScrollView>
