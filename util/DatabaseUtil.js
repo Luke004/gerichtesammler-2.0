@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { openDatabase } from 'expo-sqlite';
 
 
@@ -24,6 +25,7 @@ export function initTables() {
     const createTableImage = `CREATE TABLE IF NOT EXISTS images (
       image_id INTEGER PRIMARY KEY,
       recipe_id INTEGER NOT NULL,
+      uri TINYTEXT NOT NULL,
       FOREIGN KEY(recipe_id) REFERENCES recipes(recipe_id)
     );`
 
@@ -58,7 +60,15 @@ export function initTables() {
 export function hasNoCategoriesInDatabase(result) {
     db.transaction((transaction) => {
         transaction.executeSql("SELECT count(*) FROM categories;", undefined, (res, res2) => {
-            result(res2.rows[0]["count(*)"] == 0)
+            let rowsArray;
+
+            if (Platform.OS == "web") {
+                rowsArray = res2.rows[0];
+            } else {
+                rowsArray = res2.rows._array[0];
+            }
+
+            result(rowsArray["count(*)"] == 0)
         });
     });
 }
@@ -66,12 +76,16 @@ export function hasNoCategoriesInDatabase(result) {
 export function getAllCategories(results) {
     db.readTransaction((transaction) => {
         transaction.executeSql("SELECT * FROM categories", undefined, (res, res2) => {
-            const rows = res2.rows;
-            const arr = [];
-            for (let i = 0; i < rows.length; ++i) {
-                arr.push(rows[i]);
+            if (Platform.OS == "web") {
+                const rows = res2.rows;
+                const arr = [];
+                for (let i = 0; i < rows.length; ++i) {
+                    arr.push(rows[i]);
+                }
+                results(arr)
+            } else {
+                results(res2.rows._array)
             }
-            results(arr)
         });
     },
         (error) => {
@@ -83,7 +97,11 @@ export function getCategoryColorById(id) {
     return new Promise(resolve => {
         db.readTransaction((transaction) => {
             transaction.executeSql("SELECT category_id, color FROM categories WHERE category_id=?", [id], (res, res2) => {
-                resolve(res2.rows[0])
+                if (Platform.OS == "web") {
+                    resolve(res2.rows[0])
+                } else {
+                    resolve(res2.rows._array[0])
+                }
             });
         },
             (error) => {
@@ -120,25 +138,39 @@ export function removeCategoryFromDatabase(category, success) {
 }
 
 export function createNewRecipe(recipe) {
-    const query = `INSERT INTO recipes (name, instructions, category_id, rating, duration, last_cooked) 
+    return new Promise(resolve => {
+        const query = `INSERT INTO recipes (name, instructions, category_id, rating, duration, last_cooked) 
                     VALUES(?, ?, ?, ?, ?, ?);`
-    db.transaction((transaction) => {
-        transaction.executeSql(query, [recipe.name, recipe.instructions, recipe.category, recipe.rating, recipe.duration, recipe.lastCooked]);
+        db.transaction((transaction) => {
+            transaction.executeSql(query, [recipe.name, recipe.instructions, recipe.category, recipe.rating, recipe.duration, recipe.lastCooked], (res1, res2) => {
+                resolve(res2.insertId);
+            });
+        });
     });
 }
 
 export function getAllRecipes(results) {
     db.readTransaction((transaction) => {
         transaction.executeSql("SELECT * FROM recipes", undefined, (res, res2) => {
-            const rows = res2.rows;
-            const arr = [];
-            for (let i = 0; i < rows.length; ++i) {
-                arr.push(rows[i]);
+            if (Platform.OS == "web") {
+                const rows = res2.rows;
+                const arr = [];
+                for (let i = 0; i < rows.length; ++i) {
+                    arr.push(rows[i]);
+                }
+                results(arr)
+            } else {
+                results(res2.rows._array)
             }
-            results(arr)
         });
     },
         (error) => {
             console.log(error);
         });
+}
+
+export function addImageUriToDatabase(recipeId, uri) {
+    db.transaction((transaction) => {
+        transaction.executeSql("INSERT INTO images (recipe_id, uri) VALUES(?, ?);", [recipeId, uri]);
+    });
 }

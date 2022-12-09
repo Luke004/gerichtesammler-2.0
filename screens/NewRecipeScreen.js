@@ -7,8 +7,7 @@ import { Picker } from '@react-native-picker/picker';
 import { saveImagesToStorage } from '../util/StorageUtil';
 import { AirbnbRating } from '@rneui/themed';
 import * as ImagePicker from 'expo-image-picker';
-import { createNewRecipe, getAllCategories } from '../util/DatabaseUtil';
-import { Recipe } from "../util/RecipeUtil";
+import { createNewRecipe, getAllCategories, addImageUriToDatabase } from '../util/DatabaseUtil';
 
 
 //const categories = ["Fleisch", "Vegetarisch", "Suppe"];
@@ -94,8 +93,6 @@ function NewRecipeScreen({ navigation }) {
   };
 
   const handleAddNewRecipe = async () => {
-    saveImagesToStorage(images);
-
     // create new recipe db entry
     const recipe = {
       name: recipeName,
@@ -105,7 +102,18 @@ function NewRecipeScreen({ navigation }) {
       duration: recipeDuration,
       lastCooked: 0
     }
-    createNewRecipe(recipe);
+    const recipeId = await createNewRecipe(recipe);
+
+    // save images (if exist)
+    const imgUris = await saveImagesToStorage(images);
+    if (imgUris) {
+      console.log("imgUris")
+      console.log(imgUris)
+
+      imgUris.forEach((uri) => {
+        addImageUriToDatabase(recipeId, uri);
+      });
+    }
 
     // go back to recipe list (main)
     navigation.goBack();
@@ -147,7 +155,7 @@ function NewRecipeScreen({ navigation }) {
           onValueChange={(itemValue, itemIndex) =>
             setSelectedCategory(itemValue)
           }
-          style={{ fontSize: 18, padding: 5}}
+          style={{ fontSize: 18, padding: 5 }}
         >
           {
             categories.map((category, index) => (
