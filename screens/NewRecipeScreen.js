@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React, useState, useEffect } from "react";
 import { Text, View, TextInput, Button, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Dialog } from '@rneui/themed';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,14 +7,15 @@ import { Picker } from '@react-native-picker/picker';
 import { saveImagesToStorage } from '../util/StorageUtil';
 import { AirbnbRating } from '@rneui/themed';
 import * as ImagePicker from 'expo-image-picker';
-import { createNewRecipe } from '../util/DatabaseUtil';
-import { Recipe } from "../recipe";
+import { createNewRecipe, getAllCategories } from '../util/DatabaseUtil';
+import { Recipe } from "../util/RecipeUtil";
 
 
-const categories = ["Fleisch", "Vegetarisch", "Suppe"];
+//const categories = ["Fleisch", "Vegetarisch", "Suppe"];
 const recipeRatingDefault = 2;
 
 function NewRecipeScreen({ navigation }) {
+  const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState();
   const [images, setImages] = useState([]);
   const [imageIndex, setImageIndex] = useState([]);
@@ -24,6 +25,13 @@ function NewRecipeScreen({ navigation }) {
   const [recipeInstructions, setRecipeInstructions] = useState("");
   const [recipeDuration, setRecipeDuration] = useState(0);
   const [recipeRating, setRecipeRating] = useState(recipeRatingDefault);
+
+  useEffect(() => {
+    getAllCategories((results) => {
+      setCategories(results);
+      setSelectedCategory(results[0].category_id)
+    })
+  }, []);
 
 
   const handlePickImage = async () => {
@@ -89,15 +97,14 @@ function NewRecipeScreen({ navigation }) {
     saveImagesToStorage(images);
 
     // create new recipe db entry
-    console.log("recipeName")
-    console.log(recipeName)
-    console.log("recipeInstructions")
-    console.log(recipeInstructions)
-    console.log("recipeDuration")
-    console.log(recipeDuration)
-    console.log("recipeRating")
-    console.log(recipeRating)
-    const recipe = new Recipe(recipeName, recipeInstructions, 1);
+    const recipe = {
+      name: recipeName,
+      instructions: recipeInstructions,
+      category: selectedCategory,
+      rating: recipeRating,
+      duration: recipeDuration,
+      lastCooked: 0
+    }
     createNewRecipe(recipe);
 
     // go back to recipe list (main)
@@ -140,11 +147,11 @@ function NewRecipeScreen({ navigation }) {
           onValueChange={(itemValue, itemIndex) =>
             setSelectedCategory(itemValue)
           }
-          style={{ fontSize: 18, padding: 5 }}
+          style={{ fontSize: 18, padding: 5}}
         >
           {
             categories.map((category, index) => (
-              <Picker.Item label={category} value={category} key={index} />
+              <Picker.Item label={category.name} value={category.category_id} key={index} color={category.color} />
             ))
           }
         </Picker>

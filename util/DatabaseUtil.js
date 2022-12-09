@@ -65,7 +65,7 @@ export function hasNoCategoriesInDatabase(result) {
 
 export function getAllCategories(results) {
     db.readTransaction((transaction) => {
-        transaction.executeSql("SELECT * from categories", undefined, (res, res2) => {
+        transaction.executeSql("SELECT * FROM categories", undefined, (res, res2) => {
             const rows = res2.rows;
             const arr = [];
             for (let i = 0; i < rows.length; ++i) {
@@ -77,6 +77,19 @@ export function getAllCategories(results) {
         (error) => {
             console.log(error);
         });
+}
+
+export function getCategoryColorById(id) {
+    return new Promise(resolve => {
+        db.readTransaction((transaction) => {
+            transaction.executeSql("SELECT category_id, color FROM categories WHERE category_id=?", [id], (res, res2) => {
+                resolve(res2.rows[0])
+            });
+        },
+            (error) => {
+                console.log(error);
+            });
+    });
 }
 
 export function updateCategoriesDatabase(categories) {
@@ -107,6 +120,25 @@ export function removeCategoryFromDatabase(category, success) {
 }
 
 export function createNewRecipe(recipe) {
-
+    const query = `INSERT INTO recipes (name, instructions, category_id, rating, duration, last_cooked) 
+                    VALUES(?, ?, ?, ?, ?, ?);`
+    db.transaction((transaction) => {
+        transaction.executeSql(query, [recipe.name, recipe.instructions, recipe.category, recipe.rating, recipe.duration, recipe.lastCooked]);
+    });
 }
 
+export function getAllRecipes(results) {
+    db.readTransaction((transaction) => {
+        transaction.executeSql("SELECT * FROM recipes", undefined, (res, res2) => {
+            const rows = res2.rows;
+            const arr = [];
+            for (let i = 0; i < rows.length; ++i) {
+                arr.push(rows[i]);
+            }
+            results(arr)
+        });
+    },
+        (error) => {
+            console.log(error);
+        });
+}
