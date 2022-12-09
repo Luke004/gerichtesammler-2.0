@@ -174,3 +174,37 @@ export function addImageUriToDatabase(recipeId, uri) {
         transaction.executeSql("INSERT INTO images (recipe_id, uri) VALUES(?, ?);", [recipeId, uri]);
     });
 }
+
+export function getRecipeById(id) {
+    return new Promise(resolve => {
+        db.readTransaction((transaction) => {
+            transaction.executeSql("SELECT * FROM recipes WHERE category_id=?", [id], (res, res2) => {
+                if (Platform.OS == "web") {
+                    resolve(res2.rows[0])
+                } else {
+                    resolve(res2.rows._array[0])
+                }
+            });
+        },
+            (error) => {
+                console.log(error);
+            });
+    });
+}
+
+export function getRecipePictureUris(recipeId) {
+    return new Promise(resolve => {
+        db.readTransaction((transaction) => {
+            transaction.executeSql("SELECT uri FROM images WHERE recipe_id=?", [recipeId], (res, res2) => {
+                if (Platform.OS == "web") {
+                    resolve(res2.rows)
+                } else {
+                    resolve(res2.rows._array)
+                }
+            });
+        },
+            (error) => {
+                console.log(error);
+            });
+    });
+}

@@ -16,10 +16,9 @@ export const saveImagesToStorage = async (images) => {
     // save images to storage
     const imgUris = [];
     for (let i = 0; i < images.length; ++i) {
-        MediaLibrary.createAssetAsync(images[i].uri).then((asset) => {
-            imgUris.push(asset.uri);
-            MediaLibrary.createAlbumAsync(IMAGES_ALBUM_NAME, asset);
-        });
+        const asset = await MediaLibrary.createAssetAsync(images[i].uri);
+        imgUris.push(asset.uri);
+        MediaLibrary.createAlbumAsync(IMAGES_ALBUM_NAME, asset);
     }
 
     return imgUris;

@@ -25,7 +25,7 @@ function HomeScreen({ navigation }) {
           if (!cachedCategories[category.category_id]) {
             cachedCategories[category.category_id] = category.color;
           }
-          results[i].categoryColor = cachedCategories[category.category_id]
+          results[i].categoryColor = cachedCategories[category.category_id];
         }
 
         setRecipes(results);
@@ -40,7 +40,7 @@ function HomeScreen({ navigation }) {
       {
         hasNoCategories &&
         <View style={{ display: "flex", flexDirection: "row", padding: 10, alignItems: "center", backgroundColor: "#ebd321" }}>
-          <AntDesign name="warning" size={30} color="#e09558" style={{ flex: 1}} />
+          <AntDesign name="warning" size={30} color="#e09558" style={{ flex: 1 }} />
           <Text style={{ flex: 6, fontWeight: "bold" }}>Sie haben noch keine Kategorien hinzugefügt. Bitte tun Sie dies, bevor Sie neue Rezepte hinzufügen.</Text>
         </View>
       }
