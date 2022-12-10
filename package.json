@@ -30,7 +30,8 @@
     "expo-image-picker": "14.0.2",
     "expo-media-library": "15.0.0",
     "expo-sqlite": "11.0.0",
-    "react-native-wheel-color-picker": "1.2.0"
+    "react-native-wheel-color-picker": "1.2.0",
+    "react-native-popup-menu": "0.16.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

@@ -4,6 +4,7 @@ import { WebView } from "react-native-webview";
 import { Card } from '@rneui/themed';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as MediaLibrary from 'expo-media-library';
+import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 import { getDurationInfo, getLastCookedInfo } from "../util/RecipeUtil";
 import { getRecipePictureNames } from '../util/DatabaseUtil'
 

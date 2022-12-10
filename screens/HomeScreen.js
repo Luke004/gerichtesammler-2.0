@@ -2,12 +2,15 @@ import { React, useState, useEffect } from "react";
 import { Text, View, ImageBackground, ScrollView, TouchableOpacity } from "react-native";
 import { AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { AirbnbRating, Card } from '@rneui/themed';
+import { MenuTrigger, Menu, MenuOptions, MenuOption } from 'react-native-popup-menu';
 import { getDurationInfo, getLastCookedInfo } from "../util/RecipeUtil";
 import { getAllRecipes, getCategoryColorById, hasNoCategoriesInDatabase } from '../util/DatabaseUtil'
 
-function HomeScreen({ navigation }) {
+const HomeScreen = ({ navigation }) => {
   const [recipes, setRecipes] = useState([]);
   const [hasNoCategories, setHasNoCategories] = useState(false);
+
+  let contextMenuRefs = {};
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -32,6 +35,10 @@ function HomeScreen({ navigation }) {
     return unsubscribe;
   }, [navigation]);
 
+  const setContextMenuRef = (ref, index) => {
+    contextMenuRefs[index] = ref;
+  }
+
   return (
     <View style={{ flex: 1, justifyContent: "flex-start" }}>
       {
@@ -46,11 +53,23 @@ function HomeScreen({ navigation }) {
           recipes.map((recipe, index) => (
             <TouchableOpacity key={recipe.recipe_id}
               onPress={() => navigation.navigate('RecipeDetail', { recipe: recipe })}
-              onLongPress={() => console.log("Long press")}
+              onLongPress={() => contextMenuRefs[index].open()}
             >
               <Card containerStyle={{
                 margin: 0, paddingVertical: 7, paddingHorizontal: 15, backgroundColor: "white"
               }}>
+
+                <Menu ref={ref => setContextMenuRef(ref, index)}>
+                  <MenuTrigger />
+                  <MenuOptions customStyles={{ optionWrapper: {padding: 10}, optionText: { fontSize: 20 } }} >
+                    <MenuOption onSelect={() => alert(`Heute zubereitet`)} text='Heute zubereitet' />
+                    <MenuOption onSelect={() => alert(`Bearbeiten`)} text='Bearbeiten' />
+                    <MenuOption onSelect={() => alert(`Delete`)} >
+                      <Text style={{ fontWeight: "bold", fontSize: 20, color: "red" }}>Löschen</Text>
+                    </MenuOption>
+                  </MenuOptions>
+                </Menu>
+
                 <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
                   <View style={{ flexShrink: 1 }}>
                     <ImageBackground source={require('../assets/backgrounds/pencil-draw.png')} resizeMode="stretch"
@@ -86,9 +105,13 @@ function HomeScreen({ navigation }) {
                 </View>
               </Card>
             </TouchableOpacity>
+
           ))
         }
+
       </ScrollView>
+
+
 
       <AntDesign name="pluscircleo"
         size={70}
