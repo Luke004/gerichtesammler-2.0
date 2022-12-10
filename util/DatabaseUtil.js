@@ -25,7 +25,7 @@ export function initTables() {
     const createTableImage = `CREATE TABLE IF NOT EXISTS images (
       image_id INTEGER PRIMARY KEY,
       recipe_id INTEGER NOT NULL,
-      uri TINYTEXT NOT NULL,
+      file_name TINYTEXT NOT NULL,
       FOREIGN KEY(recipe_id) REFERENCES recipes(recipe_id)
     );`
 
@@ -169,9 +169,9 @@ export function getAllRecipes(results) {
         });
 }
 
-export function addImageUriToDatabase(recipeId, uri) {
+export function addImageToDatabase(recipeId, fileName) {
     db.transaction((transaction) => {
-        transaction.executeSql("INSERT INTO images (recipe_id, uri) VALUES(?, ?);", [recipeId, uri]);
+        transaction.executeSql("INSERT INTO images (recipe_id, file_name) VALUES(?, ?);", [recipeId, fileName]);
     });
 }
 
@@ -192,10 +192,10 @@ export function getRecipeById(id) {
     });
 }
 
-export function getRecipePictureUris(recipeId) {
+export function getRecipePictureNames(recipeId) {
     return new Promise(resolve => {
         db.readTransaction((transaction) => {
-            transaction.executeSql("SELECT uri FROM images WHERE recipe_id=?", [recipeId], (res, res2) => {
+            transaction.executeSql("SELECT file_name FROM images WHERE recipe_id=?", [recipeId], (res, res2) => {
                 if (Platform.OS == "web") {
                     resolve(res2.rows)
                 } else {

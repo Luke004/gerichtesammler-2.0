@@ -1,7 +1,6 @@
-import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 
-const IMAGES_ALBUM_NAME = "gerichtesammler";
+export const IMAGES_ALBUM_NAME = "gerichtesammler";
 
 export const saveImagesToStorage = async (images) => {
     if (images.length == 0) return;
@@ -14,16 +13,12 @@ export const saveImagesToStorage = async (images) => {
     }
 
     // save images to storage
-    const imgUris = [];
+    const imgFileNames = [];
     for (let i = 0; i < images.length; ++i) {
         const asset = await MediaLibrary.createAssetAsync(images[i].uri);
-        imgUris.push(asset.uri);
-        MediaLibrary.createAlbumAsync(IMAGES_ALBUM_NAME, asset);
+        imgFileNames.push(asset.filename);
+        MediaLibrary.createAlbumAsync(IMAGES_ALBUM_NAME, asset, false);
     }
 
-    return imgUris;
-    /*
-    // NOTE: how to read an img file by uri
-    const test = await FileSystem.readAsStringAsync(imgUri, {encoding: "base64"});
-    */
+    return imgFileNames;
 };

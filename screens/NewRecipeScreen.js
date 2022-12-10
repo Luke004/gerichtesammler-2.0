@@ -7,7 +7,7 @@ import { Picker } from '@react-native-picker/picker';
 import { saveImagesToStorage } from '../util/StorageUtil';
 import { AirbnbRating } from '@rneui/themed';
 import * as ImagePicker from 'expo-image-picker';
-import { createNewRecipe, getAllCategories, addImageUriToDatabase } from '../util/DatabaseUtil';
+import { createNewRecipe, getAllCategories, addImageToDatabase } from '../util/DatabaseUtil';
 
 
 //const categories = ["Fleisch", "Vegetarisch", "Suppe"];
@@ -105,13 +105,13 @@ function NewRecipeScreen({ navigation }) {
     const recipeId = await createNewRecipe(recipe);
 
     // save images (if exist)
-    const imgUris = await saveImagesToStorage(images);
-    if (imgUris) {
-      console.log("imgUris")
-      console.log(imgUris)
+    const imgFileNames = await saveImagesToStorage(images);
+    if (imgFileNames) {
+      console.log("imgFileNames")
+      console.log(imgFileNames)
 
-      imgUris.forEach((uri) => {
-        addImageUriToDatabase(recipeId, uri);
+      imgFileNames.forEach((fileName) => {
+        addImageToDatabase(recipeId, fileName);
       });
     }
 

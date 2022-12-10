@@ -19,19 +19,10 @@ function EditCategoriesScreen({ navigation }) {
   const [nameChange, setNameChange] = useState({});
   categoriesReference = categories;
 
-  /*
-  useEffect(() => {
-    
-  }, []);
-  */
-
   useEffect(() => {
     // this listener is called when user leaves this screen
     const unsubscribe = navigation.addListener('focus', () => {
-      console.log("FOCUS")
       getAllCategories((results) => {
-        console.log("results")
-        console.log(results)
         setCategories(results);
       })
     });
@@ -42,9 +33,6 @@ function EditCategoriesScreen({ navigation }) {
     // this listener is called when user leaves this screen
     const unsubscribe = navigation.addListener('beforeRemove', () => {
       // for some reason state 'categories' is empty here so we use a reference to it which still has them
-      console.log("categories")
-      console.log(categories)
-      console.log(categoriesReference)
       updateCategoriesDatabase(categoriesReference);
     });
     return unsubscribe;
