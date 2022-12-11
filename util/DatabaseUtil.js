@@ -139,10 +139,10 @@ export function removeCategoryFromDatabase(category, success) {
 
 export function createNewRecipe(recipe) {
     return new Promise(resolve => {
-        const query = `INSERT INTO recipes (name, instructions, category_id, rating, duration, last_cooked) 
+        const query = `INSERT INTO recipes (name, instructions, category_id, rating, duration) 
                     VALUES(?, ?, ?, ?, ?, ?);`
         db.transaction((transaction) => {
-            transaction.executeSql(query, [recipe.name, recipe.instructions, recipe.category, recipe.rating, recipe.duration, recipe.lastCooked], (res1, res2) => {
+            transaction.executeSql(query, [recipe.name, recipe.instructions, recipe.category, recipe.rating, recipe.duration], (res1, res2) => {
                 resolve(res2.insertId);
             });
         });
@@ -151,17 +151,23 @@ export function createNewRecipe(recipe) {
 
 export function getAllRecipes(results) {
     db.readTransaction((transaction) => {
-        transaction.executeSql("SELECT * FROM recipes", undefined, (res, res2) => {
+        transaction.executeSql("SELECT * FROM recipes", undefined, async (res, res2) => {
+            let recipes;
             if (Platform.OS == "web") {
                 const rows = res2.rows;
                 const arr = [];
                 for (let i = 0; i < rows.length; ++i) {
                     arr.push(rows[i]);
                 }
-                results(arr)
+                recipes = arr;
             } else {
-                results(res2.rows._array)
+                recipes = res2.rows._array;
             }
+            // get and set last cooked info for actual day
+            for (let i = 0; i < recipes.length; ++i) {
+                recipes[i].last_cooked = await getNumberOfDaysLastCooked(recipes[i]);
+            }
+            results(recipes)
         });
     },
         (error) => {
@@ -201,6 +207,39 @@ export function getRecipePictureNames(recipeId) {
                 } else {
                     resolve(res2.rows._array)
                 }
+            });
+        },
+            (error) => {
+                console.log(error);
+            });
+    });
+}
+
+export function markAsCooked(recipeId) {
+    return new Promise(resolve => {
+        db.transaction((transaction) => {
+            transaction.executeSql("UPDATE recipes SET last_cooked = julianday('now') WHERE recipe_id = ?;", [recipeId], (res, res2) => {
+                console.log(res2.rows._array)
+                resolve();
+            });
+        },
+            (error) => {
+                console.log(error);
+            });
+    });
+}
+
+function getNumberOfDaysLastCooked(recipe) {
+    return new Promise(resolve => {
+        db.transaction((transaction) => {
+            transaction.executeSql("SELECT (julianday('now') - " + recipe.last_cooked + ");", undefined, (res, res2) => {
+                let daysSinceLastCooked;
+                if (Platform.OS == "web") {
+                    daysSinceLastCooked = Math.floor(Object.values(res2.rows[0])[0]);
+                } else {
+                    daysSinceLastCooked = Math.floor(Object.values(res2.rows._array[0])[0]);
+                }
+                resolve(daysSinceLastCooked)
             });
         },
             (error) => {

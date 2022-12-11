@@ -3,8 +3,8 @@ import { Text, View, ImageBackground, ScrollView, TouchableOpacity } from "react
 import { AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { AirbnbRating, Card } from '@rneui/themed';
 import { MenuTrigger, Menu, MenuOptions, MenuOption } from 'react-native-popup-menu';
-import { getDurationInfo, getLastCookedInfo } from "../util/RecipeUtil";
-import { getAllRecipes, getCategoryColorById, hasNoCategoriesInDatabase } from '../util/DatabaseUtil'
+import { convertToReadableDurationInfo, convertToReadableLastCookedInfo } from "../util/RecipeUtil";
+import { getAllRecipes, getCategoryColorById, hasNoCategoriesInDatabase, markAsCooked } from '../util/DatabaseUtil'
 
 const HomeScreen = ({ navigation }) => {
   const [recipes, setRecipes] = useState([]);
@@ -19,15 +19,17 @@ const HomeScreen = ({ navigation }) => {
       });
 
       getAllRecipes(async (results) => {
+        // cache repeated categories for less db requests
         let cachedCategories = {};
         for (let i = 0; i < results.length; ++i) {
-          const category = await getCategoryColorById(results[i].category_id);
+          const recipe = results[i];
+          // get and set category color
+          const category = await getCategoryColorById(recipe.category_id);
           if (!cachedCategories[category.category_id]) {
             cachedCategories[category.category_id] = category.color;
           }
-          results[i].categoryColor = cachedCategories[category.category_id];
+          recipe.categoryColor = cachedCategories[category.category_id];
         }
-
         setRecipes(results);
       })
     });
@@ -61,8 +63,8 @@ const HomeScreen = ({ navigation }) => {
 
                 <Menu ref={ref => setContextMenuRef(ref, index)}>
                   <MenuTrigger />
-                  <MenuOptions customStyles={{ optionWrapper: {padding: 10}, optionText: { fontSize: 20 } }} >
-                    <MenuOption onSelect={() => alert(`Heute zubereitet`)} text='Heute zubereitet' />
+                  <MenuOptions customStyles={{ optionWrapper: { padding: 10 }, optionText: { fontSize: 20 } }} >
+                    <MenuOption onSelect={() => markAsCooked(recipe.recipe_id)} text='Heute zubereitet' />
                     <MenuOption onSelect={() => alert(`Bearbeiten`)} text='Bearbeiten' />
                     <MenuOption onSelect={() => alert(`Delete`)} >
                       <Text style={{ fontWeight: "bold", fontSize: 20, color: "red" }}>Löschen</Text>
@@ -94,13 +96,13 @@ const HomeScreen = ({ navigation }) => {
                   />
                 </View>
                 <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", marginTop: 15 }}>
-                  <View style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 3 }}>
+                  <View style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
                     <Ionicons name="time" size={24} color="black" />
-                    <Text>{getDurationInfo(recipe.duration)}</Text>
+                    <Text style={{ paddingLeft: 3 }}>{convertToReadableDurationInfo(recipe.duration)}</Text>
                   </View>
                   <View style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "flex-end", gap: 3 }}>
                     <MaterialCommunityIcons name="silverware-fork-knife" size={24} color="black" />
-                    <Text>{getLastCookedInfo(recipe.lastCooked)}</Text>
+                    <Text style={{ paddingLeft: 3 }}>{convertToReadableLastCookedInfo(recipe.last_cooked)}</Text>
                   </View>
                 </View>
               </Card>

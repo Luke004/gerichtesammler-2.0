@@ -1,5 +1,5 @@
-export function getLastCookedInfo(lastCooked, detailed = false) {
-    if (!lastCooked) return detailed ? "noch nie" : "-";
+export function convertToReadableLastCookedInfo(lastCooked, detailed = false) {
+    if (!lastCooked || lastCooked == 0) return detailed ? "noch nie" : "-";
 
     if (lastCooked == 1) {
         return "gestern";
@@ -23,7 +23,7 @@ export function getLastCookedInfo(lastCooked, detailed = false) {
     return "-";
 }
 
-export function getDurationInfo(duration) {
+export function convertToReadableDurationInfo(duration) {
     if (!duration) return "keine Angabe"
 
     if (duration <= 59) {

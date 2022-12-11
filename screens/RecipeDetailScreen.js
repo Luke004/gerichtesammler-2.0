@@ -4,8 +4,7 @@ import { WebView } from "react-native-webview";
 import { Card } from '@rneui/themed';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as MediaLibrary from 'expo-media-library';
-import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
-import { getDurationInfo, getLastCookedInfo } from "../util/RecipeUtil";
+import { convertToReadableDurationInfo, convertToReadableLastCookedInfo } from "../util/RecipeUtil";
 import { getRecipePictureNames } from '../util/DatabaseUtil'
 
 const PAPER_BACKGROUND = require('../assets/backgrounds/old-paper.jpg');
@@ -89,11 +88,11 @@ function RecipeDetailScreen({ route, navigation }) {
             <View style={{ display: "flex", width: "100%", flexDirection: "row", justifyContent: "space-around", padding: 5 }}>
               <View style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
                 <Ionicons name="time" size={24} color="black" />
-                <Text style={{ paddingLeft: 3 }}>{getDurationInfo(recipe.duration)}</Text>
+                <Text style={{ paddingLeft: 3 }}>{convertToReadableDurationInfo(recipe.duration)}</Text>
               </View>
               <View style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "flex-end" }}>
                 <MaterialCommunityIcons name="silverware-fork-knife" size={24} color="black" />
-                <Text style={{ paddingLeft: 3 }}>{getLastCookedInfo(recipe.lastCooked, true)}</Text>
+                <Text style={{ paddingLeft: 3 }}>{convertToReadableLastCookedInfo(recipe.last_cooked, true)}</Text>
               </View>
             </View>
 

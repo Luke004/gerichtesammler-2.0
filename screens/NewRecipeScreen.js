@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import { Text, View, TextInput, Button, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, View, ScrollView, TextInput, Button, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Dialog } from '@rneui/themed';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
@@ -99,8 +99,7 @@ function NewRecipeScreen({ navigation }) {
       instructions: recipeInstructions,
       category: selectedCategory,
       rating: recipeRating,
-      duration: recipeDuration,
-      lastCooked: 0
+      duration: recipeDuration
     }
     const recipeId = await createNewRecipe(recipe);
 
@@ -121,123 +120,126 @@ function NewRecipeScreen({ navigation }) {
 
   return (
     <View style={{ justifyContent: "flex-start", padding: 10, gap: 10 }}>
-      <View>
-        <Text style={styles.text}>
-          Name
-        </Text>
-        <TextInput
-          style={styles.textInput}
-          onChangeText={(value) => setRecipeName(value)}
-          value={recipeName}
-        />
-      </View>
+      <ScrollView>
 
-      <View>
-        <Text style={styles.text}>
-          Beschreibung
-        </Text>
-        <TextInput
-          editable
-          multiline
-          numberOfLines={3}
-          style={styles.textInput}
-          onChangeText={(value) => setRecipeInstructions(value)}
-          value={recipeInstructions}
-        />
-      </View>
+        <View>
+          <Text style={styles.text}>
+            Name
+          </Text>
+          <TextInput
+            style={styles.textInput}
+            onChangeText={(value) => setRecipeName(value)}
+            value={recipeName}
+          />
+        </View>
 
-      <View>
-        <Text style={styles.text}>
-          Kategorie
-        </Text>
-        <Picker
-          selectedValue={selectedCategory}
-          onValueChange={(itemValue, itemIndex) =>
-            setSelectedCategory(itemValue)
-          }
-          style={{ fontSize: 18, padding: 5 }}
+        <View>
+          <Text style={styles.text}>
+            Beschreibung
+          </Text>
+          <TextInput
+            editable
+            multiline
+            numberOfLines={3}
+            style={styles.textInput}
+            onChangeText={(value) => setRecipeInstructions(value)}
+            value={recipeInstructions}
+          />
+        </View>
+
+        <View>
+          <Text style={styles.text}>
+            Kategorie
+          </Text>
+          <Picker
+            selectedValue={selectedCategory}
+            onValueChange={(itemValue, itemIndex) =>
+              setSelectedCategory(itemValue)
+            }
+            style={{ fontSize: 18, padding: 5 }}
+          >
+            {
+              categories.map((category, index) => (
+                <Picker.Item label={category.name} value={category.category_id} key={index} color={category.color} />
+              ))
+            }
+          </Picker>
+        </View>
+
+        <View>
+          <Text style={styles.text}>
+            Dauer (Min.)
+          </Text>
+          <TextInput
+            keyboardType="numeric"
+            style={[styles.textInput, { width: "50%" }]}
+            onChangeText={(value) => setRecipeDuration(value)}
+            value={recipeDuration}
+          />
+        </View>
+
+        <View>
+          <Text style={styles.text}>
+            Bilder
+          </Text>
+          <View style={{ flexDirection: "row", gap: 3 }}>
+            {
+              images.length == 0 &&
+              <Text style={{ paddingVertical: 5 }}>Noch keine Bilder ausgewählt!</Text>
+            }
+            {
+              images.map((image, index) => (
+                <TouchableOpacity key={index} onPress={() => handleRemoveImage(index)}>
+                  <Image source={{ uri: image.uri }} style={{ width: 50, height: 50 }}></Image>
+                </TouchableOpacity>
+              ))
+            }
+          </View>
+          <View style={{ flexDirection: "row", gap: 5 }}>
+            <Feather name="paperclip" size={35} color="black" onPress={handlePickImage} />
+            <Ionicons name="camera" size={35} color="black" onPress={handleTakePhoto} />
+          </View>
+        </View>
+
+        <View style={{ alignItems: "flex-start" }}>
+          <Text style={styles.text}>
+            Bewertung
+          </Text>
+          <AirbnbRating
+            ratingContainerStyle={{ flexDirection: "row-reverse" }}
+            count={5}
+            reviews={[
+              'Okay',
+              'Gut',
+              'Lecker',
+              'Großartig',
+              'Exzellent'
+            ]}
+            defaultRating={recipeRatingDefault}
+            size={20}
+            reviewSize={20}
+            onFinishRating={(number) => setRecipeRating(number)}
+          />
+        </View>
+
+        <Button
+          title="Rezept Hinzufügen"
+          onPress={handleAddNewRecipe}
+        />
+
+        <Dialog
+          isVisible={confirmDeleteImageDialogVisible}
+          onBackdropPress={toggleConfirmImageDeleteDialog}
         >
-          {
-            categories.map((category, index) => (
-              <Picker.Item label={category.name} value={category.category_id} key={index} color={category.color} />
-            ))
-          }
-        </Picker>
-      </View>
+          <Dialog.Title title="Löschen bestätigen" />
+          <Text>Ausgewähltes Bild wirklich löschen?</Text>
+          <Dialog.Actions>
+            <Dialog.Button title="Bestätigen" onPress={removeImage} />
+            <Dialog.Button title="Abbrechen" onPress={toggleConfirmImageDeleteDialog} />
+          </Dialog.Actions>
+        </Dialog>
 
-      <View>
-        <Text style={styles.text}>
-          Dauer (Min.)
-        </Text>
-        <TextInput
-          keyboardType="numeric"
-          style={[styles.textInput, { width: "50%" }]}
-          onChangeText={(value) => setRecipeDuration(value)}
-          value={recipeDuration}
-        />
-      </View>
-
-      <View>
-        <Text style={styles.text}>
-          Bilder
-        </Text>
-        <View style={{ flexDirection: "row", gap: 3 }}>
-          {
-            images.length == 0 &&
-            <Text style={{ paddingVertical: 5 }}>Noch keine Bilder ausgewählt!</Text>
-          }
-          {
-            images.map((image, index) => (
-              <TouchableOpacity key={index} onPress={() => handleRemoveImage(index)}>
-                <Image source={{ uri: image.uri }} style={{ width: 50, height: 50 }}></Image>
-              </TouchableOpacity>
-            ))
-          }
-        </View>
-        <View style={{ flexDirection: "row", gap: 5 }}>
-          <Feather name="paperclip" size={35} color="black" onPress={handlePickImage} />
-          <Ionicons name="camera" size={35} color="black" onPress={handleTakePhoto} />
-        </View>
-      </View>
-
-      <View style={{ alignItems: "flex-start" }}>
-        <Text style={styles.text}>
-          Bewertung
-        </Text>
-        <AirbnbRating
-          ratingContainerStyle={{ flexDirection: "row-reverse" }}
-          count={5}
-          reviews={[
-            'Okay',
-            'Gut',
-            'Lecker',
-            'Großartig',
-            'Exzellent'
-          ]}
-          defaultRating={recipeRatingDefault}
-          size={20}
-          reviewSize={20}
-          onFinishRating={(number) => setRecipeRating(number)}
-        />
-      </View>
-
-      <Button
-        title="Rezept Hinzufügen"
-        onPress={handleAddNewRecipe}
-      />
-
-      <Dialog
-        isVisible={confirmDeleteImageDialogVisible}
-        onBackdropPress={toggleConfirmImageDeleteDialog}
-      >
-        <Dialog.Title title="Löschen bestätigen" />
-        <Text>Ausgewähltes Bild wirklich löschen?</Text>
-        <Dialog.Actions>
-          <Dialog.Button title="Bestätigen" onPress={removeImage} />
-          <Dialog.Button title="Abbrechen" onPress={toggleConfirmImageDeleteDialog} />
-        </Dialog.Actions>
-      </Dialog>
-
+      </ScrollView>
     </View >
   );
 }
