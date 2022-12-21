@@ -1,14 +1,21 @@
 import { React, useState, useEffect } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { Picker } from '@react-native-picker/picker';
+import { SORTING_OPTIONS_FRIENDLY, SORTING_OPTIONS_DB, SORTING_OPTIONS, FILTER_OPTIONS_FRIENDLY, FILTER_OPTIONS_DB } from '../util/SettingsUtil';
+import { getSortingCriteria, setSortingCriteria } from '../util/DatabaseUtil';
 
-
-const sortingOptions = ["Name", "Kategorie", "Bewertung", "Lange nicht zubereitet", "Dauer"]
-const filterOptions = ["Kein Filter", "Name", "Kategorie", "Bewertung", "Zubereitet", "Dauer"]
+let sortingEntryId;
 
 function Settings({ navigation }) {
-  const [selectedSorting, setSelectedSorting] = useState("Kategorie");
+  const [selectedSorting, setSelectedSorting] = useState();
   const [selectedFilter, setSelectedFilter] = useState("Kein Filter");
+
+  useEffect(() => {
+    getSortingCriteria().then((result) => {
+      setSelectedSorting(result.criteria);
+      sortingEntryId = result.id;
+    });
+  }, []);
 
   return (
     <View style={{ flex: 1, padding: 20 }}>
@@ -17,14 +24,15 @@ function Settings({ navigation }) {
         <Text style={styles.pickerInfoText}>Sortieren nach:</Text>
         <Picker
           selectedValue={selectedSorting}
-          onValueChange={(itemValue, itemIndex) =>
-            setSelectedSorting(itemValue)
-          }
+          onValueChange={(itemValue, itemIndex) => {
+            setSelectedSorting(itemValue);
+            setSortingCriteria(sortingEntryId, SORTING_OPTIONS_DB[itemIndex]);
+          }}
           style={styles.picker}
         >
           {
-            sortingOptions.map((sortingOption, index) => (
-              <Picker.Item label={sortingOption} value={sortingOption} key={index} />
+            SORTING_OPTIONS_FRIENDLY.map((sortingOption, index) => (
+              <Picker.Item label={sortingOption} value={SORTING_OPTIONS_DB[index]} key={index} />
             ))
           }
         </Picker>
@@ -40,8 +48,8 @@ function Settings({ navigation }) {
           style={styles.picker}
         >
           {
-            filterOptions.map((filterOption, index) => (
-              <Picker.Item label={filterOption} value={filterOption} key={index} />
+            FILTER_OPTIONS_FRIENDLY.map((filterOption, index) => (
+              <Picker.Item label={filterOption} value={FILTER_OPTIONS_DB[index]} key={index} />
             ))
           }
         </Picker>

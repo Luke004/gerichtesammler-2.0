@@ -1,60 +1,141 @@
 import { Platform } from 'react-native';
 import { openDatabase } from 'expo-sqlite';
 import { deleteImagesFromStorage, deleteAssetsFromStorage } from './StorageUtil';
+import { FILTER_OPTIONS_DB, SORTING_OPTIONS_DB } from './SettingsUtil';
+
 
 const db = openDatabase('myDb', "1.0");
 
 export function initTables() {
-    const createTableCategory = `CREATE TABLE IF NOT EXISTS categories (
-        category_id INTEGER PRIMARY KEY,
-        name TINYTEXT NOT NULL,
-        color TINYTEXT NOT NULL
-      );`
-
-    const createTableRecipe = `CREATE TABLE IF NOT EXISTS recipes (
-      recipe_id INTEGER PRIMARY KEY,
-      name TINYTEXT NOT NULL,
-      instructions TEXT,
-      category_id INTEGER NOT NULL,
-      rating INTEGER,
-      duration INTEGER,
-      last_cooked INTEGER,
-      FOREIGN KEY(category_id) REFERENCES categories(category_id)
+    const tables = [
+        `CREATE TABLE IF NOT EXISTS categories (
+            category_id INTEGER PRIMARY KEY,
+            name TINYTEXT NOT NULL,
+            color TINYTEXT NOT NULL
+    );`,
+        `CREATE TABLE IF NOT EXISTS recipes (
+            recipe_id INTEGER PRIMARY KEY,
+            name TINYTEXT NOT NULL,
+            instructions TEXT,
+            category_id INTEGER NOT NULL,
+            rating INTEGER,
+            duration INTEGER,
+            last_cooked INTEGER,
+            FOREIGN KEY(category_id) REFERENCES categories(category_id)
+    );`,
+        `CREATE TABLE IF NOT EXISTS images (
+            image_id INTEGER PRIMARY KEY,
+            recipe_id INTEGER NOT NULL,
+            file_name TINYTEXT NOT NULL,
+            FOREIGN KEY(recipe_id) REFERENCES recipes(recipe_id)
+    );`,
+        `CREATE TABLE IF NOT EXISTS config_sorting (
+            sorting_id INTEGER PRIMARY KEY,
+            criteria TINYTEXT
+    );`,
+        `CREATE TABLE IF NOT EXISTS config_filter (
+            filter_id INTEGER PRIMARY KEY,
+            type TINYTEXT,
+            criteria TINYTEXT
     );`
+    ];
 
-    const createTableImage = `CREATE TABLE IF NOT EXISTS images (
-      image_id INTEGER PRIMARY KEY,
-      recipe_id INTEGER NOT NULL,
-      file_name TINYTEXT NOT NULL,
-      FOREIGN KEY(recipe_id) REFERENCES recipes(recipe_id)
-    );`
+    let tablesCreated = 0;
 
-    db.transaction((transaction) => {
-        transaction.executeSql(createTableCategory);
-    },
-        (error) => {
-            console.log(error);
-        }, () => {
-            console.log("success createTableCategory");
+    new Promise(resolve => {
+        tables.forEach((table) => {
+            db.transaction((transaction) => {
+                transaction.executeSql(table);
+            },
+                (error) => {
+                    console.log(error);
+                }, () => {
+                    console.log("table created");
+                    tablesCreated++;
+                    if (tablesCreated == tables.length) {
+                        resolve();
+                    }
+                });
         });
-
-    db.transaction((transaction) => {
-        transaction.executeSql(createTableRecipe);
-    },
-        (error) => {
-            console.log(error);
-        }, () => {
-            console.log("success createTableRecipe");
+    }).then(() => {
+        getSortingCriteria().then((res) => {
+            if (!res) {
+                initSortingCriteria();
+            }
         });
-
-    db.transaction((transaction) => {
-        transaction.executeSql(createTableImage);
-    },
-        (error) => {
-            console.log(error);
-        }, () => {
-            console.log("success createTableImage");
+        getFilterCriteria().then((res) => {
+            if (!res) {
+                initFilterCriteria();
+            }
         });
+    });
+    //dropTable();
+}
+
+function dropTable() {
+    db.transaction((transaction) => { transaction.executeSql("DROP TABLE config_sorting;") },
+        (error) => console.log(error));
+}
+
+function initSortingCriteria() {
+    db.transaction((transaction) => { transaction.executeSql("INSERT INTO config_sorting (criteria) VALUES(?);", SORTING_OPTIONS_DB[0]) },
+        (error) => console.log(error));
+}
+
+function initFilterCriteria() {
+    db.transaction((transaction) => { transaction.executeSql("INSERT INTO config_filter (type) VALUES(?);", FILTER_OPTIONS_DB[0]) },
+        (error) => console.log(error));
+}
+
+export function getSortingCriteria() {
+    return new Promise(resolve => {
+        db.readTransaction((transaction) => {
+            transaction.executeSql("SELECT * FROM config_sorting", undefined, (res, res2) => {
+                let rows;
+                if (Platform.OS == "web") {
+                    rows = res2.rows[0];
+                } else {
+                    rows = res2.rows._array[0];
+                }
+                resolve(rows ? { criteria: rows.criteria, id: rows.sorting_id } : undefined);
+            });
+        },
+            (error) => {
+                console.log(error);
+            });
+    });
+}
+
+export function getFilterCriteria() {
+    return new Promise(resolve => {
+        db.readTransaction((transaction) => {
+            transaction.executeSql("SELECT * FROM config_filter", undefined, (res, res2) => {
+                let rows;
+                if (Platform.OS == "web") {
+                    rows = res2.rows[0];
+                } else {
+                    rows = res2.rows._array[0];
+                }
+                resolve(rows ? rows : undefined);
+            });
+        },
+            (error) => {
+                console.log(error);
+            });
+    });
+}
+
+export function setSortingCriteria(id, criteria) {
+    return new Promise(resolve => {
+        db.transaction((transaction) => {
+            transaction.executeSql("UPDATE config_sorting SET criteria = ? WHERE sorting_id = ?;", [criteria, id]);
+        },
+            (error) => {
+                console.log(error);
+            }, () => {
+                resolve();
+            });
+    });
 }
 
 export function hasNoCategoriesInDatabase(result) {
@@ -204,10 +285,10 @@ export function removeImageAssetsForRecipe(recipeId, imageAssets) {
     imageAssets.forEach((asset) => {
         db.transaction((transaction) => {
             transaction.executeSql("DELETE FROM images WHERE recipe_id = ? AND file_name = ?;", [recipeId, asset.filename],
-            undefined,
-            (err) => {
-                console.log(err);
-            });
+                undefined,
+                (err) => {
+                    console.log(err);
+                });
         }, (err) => console.log(err), () => {
             console.log("Deleted image row " + asset.id + " for recipeId " + recipeId);
         });

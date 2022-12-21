@@ -4,7 +4,8 @@ import { AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 import { AirbnbRating, Card, Dialog } from '@rneui/themed';
 import { MenuTrigger, Menu, MenuOptions, MenuOption } from 'react-native-popup-menu';
 import { convertToReadableDurationInfo, convertToReadableLastCookedInfo } from "../util/RecipeUtil";
-import { getAllRecipes, getCategoryColorById, hasNoCategoriesInDatabase, markAsCooked, deleteRecipe } from '../util/DatabaseUtil'
+import { getAllRecipes, getCategoryColorById, hasNoCategoriesInDatabase, markAsCooked, deleteRecipe, getSortingCriteria } from '../util/DatabaseUtil'
+import { sortRecipesByCriteria } from '../util/SettingsUtil'
 
 const HomeScreen = ({ navigation }) => {
   const [recipes, setRecipes] = useState([]);
@@ -19,11 +20,11 @@ const HomeScreen = ({ navigation }) => {
         setHasNoCategories(result);
       });
 
-      getAllRecipes(async (results) => {
+      getAllRecipes(async (recipes) => {
         // cache repeated categories for less db requests
         let cachedCategories = {};
-        for (let i = 0; i < results.length; ++i) {
-          const recipe = results[i];
+        for (let i = 0; i < recipes.length; ++i) {
+          const recipe = recipes[i];
           // get and set category color
           const categoryColor = await getCategoryColorById(recipe.category_id);
           if (!cachedCategories[recipe.category_id]) {
@@ -31,7 +32,12 @@ const HomeScreen = ({ navigation }) => {
           }
           recipe.categoryColor = cachedCategories[recipe.category_id];
         }
-        setRecipes(results);
+        // sort the recipes
+        getSortingCriteria().then((result) => {
+          recipes = sortRecipesByCriteria(recipes, result.criteria);
+          setRecipes(recipes);
+        });
+
       })
     });
 
