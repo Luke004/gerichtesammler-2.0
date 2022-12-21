@@ -25,9 +25,6 @@ function RecipeDetailScreen({ route, navigation }) {
 
   const recipe = route.params.recipe;
 
-  console.log("recipe")
-  console.log(route.params)
-
   let paperBackground;
   if (recipe.instructions.length < 250) {
     paperBackground = PAPER_BACKGROUND_SMALL;
