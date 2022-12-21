@@ -4,8 +4,8 @@ import { AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 import { AirbnbRating, Card, Dialog } from '@rneui/themed';
 import { MenuTrigger, Menu, MenuOptions, MenuOption } from 'react-native-popup-menu';
 import { convertToReadableDurationInfo, convertToReadableLastCookedInfo } from "../util/RecipeUtil";
-import { getAllRecipes, getCategoryColorById, hasNoCategoriesInDatabase, markAsCooked, deleteRecipe, getSortingCriteria } from '../util/DatabaseUtil'
-import { sortRecipesByCriteria } from '../util/SettingsUtil'
+import { getAllRecipes, getCategoryColorById, hasNoCategoriesInDatabase, markAsCooked, deleteRecipe, getSortingCriteria, getFilterCriteria } from '../util/DatabaseUtil'
+import { sortRecipesByCriteria, filterRecipesByCriteria } from '../util/SettingsUtil'
 
 const HomeScreen = ({ navigation }) => {
   const [recipes, setRecipes] = useState([]);
@@ -32,6 +32,10 @@ const HomeScreen = ({ navigation }) => {
           }
           recipe.categoryColor = cachedCategories[recipe.category_id];
         }
+        // filter the recipes
+        const filterCriteria = await getFilterCriteria();
+        recipes = filterRecipesByCriteria(recipes, filterCriteria);
+
         // sort the recipes
         getSortingCriteria().then((result) => {
           recipes = sortRecipesByCriteria(recipes, result.criteria);

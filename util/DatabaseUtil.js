@@ -97,7 +97,7 @@ export function getSortingCriteria() {
                 } else {
                     rows = res2.rows._array[0];
                 }
-                resolve(rows ? { criteria: rows.criteria, id: rows.sorting_id } : undefined);
+                resolve(rows ? { id: rows.sorting_id, criteria: rows.criteria } : undefined);
             });
         },
             (error) => {
@@ -116,7 +116,7 @@ export function getFilterCriteria() {
                 } else {
                     rows = res2.rows._array[0];
                 }
-                resolve(rows ? rows : undefined);
+                resolve(rows ? { id: rows.filter_id, type: rows.type, criteria: rows.criteria } : undefined);
             });
         },
             (error) => {
@@ -129,6 +129,19 @@ export function setSortingCriteria(id, criteria) {
     return new Promise(resolve => {
         db.transaction((transaction) => {
             transaction.executeSql("UPDATE config_sorting SET criteria = ? WHERE sorting_id = ?;", [criteria, id]);
+        },
+            (error) => {
+                console.log(error);
+            }, () => {
+                resolve();
+            });
+    });
+}
+
+export function setFilterCriteria(id, type, criteria) {
+    return new Promise(resolve => {
+        db.transaction((transaction) => {
+            transaction.executeSql("UPDATE config_filter SET type = ?, criteria = ? WHERE filter_id = ?;", [type, criteria, id]);
         },
             (error) => {
                 console.log(error);

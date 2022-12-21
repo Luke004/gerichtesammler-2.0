@@ -1,20 +1,36 @@
 import { React, useState, useEffect } from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TextInput, View, TouchableOpacity } from "react-native";
 import { Picker } from '@react-native-picker/picker';
-import { SORTING_OPTIONS_FRIENDLY, SORTING_OPTIONS_DB, SORTING_OPTIONS, FILTER_OPTIONS_FRIENDLY, FILTER_OPTIONS_DB } from '../util/SettingsUtil';
-import { getSortingCriteria, setSortingCriteria } from '../util/DatabaseUtil';
+import { SORTING_OPTIONS_FRIENDLY, SORTING_OPTIONS_DB, FILTER_OPTIONS_FRIENDLY, FILTER_OPTIONS_DB } from '../util/SettingsUtil';
+import { getSortingCriteria, setSortingCriteria, getFilterCriteria, setFilterCriteria } from '../util/DatabaseUtil';
 
 let sortingEntryId;
+let filterEntryId;
 
 function Settings({ navigation }) {
   const [selectedSorting, setSelectedSorting] = useState();
-  const [selectedFilter, setSelectedFilter] = useState("Kein Filter");
+  const [selectedFilter, setSelectedFilter] = useState();
+
+  const [nameFilter, setNameFilter] = useState("");
 
   useEffect(() => {
     getSortingCriteria().then((result) => {
       setSelectedSorting(result.criteria);
       sortingEntryId = result.id;
     });
+
+    getFilterCriteria().then((result) => {
+      setSelectedFilter(result.type);
+      filterEntryId = result.id;
+
+      switch (result.type) {
+        case "name":
+          setNameFilter(result.criteria);
+          break;
+      }
+
+    });
+
   }, []);
 
   return (
@@ -42,9 +58,13 @@ function Settings({ navigation }) {
         <Text style={styles.pickerInfoText}>Filtern nach:</Text>
         <Picker
           selectedValue={selectedFilter}
-          onValueChange={(itemValue, itemIndex) =>
-            setSelectedFilter(itemValue)
-          }
+          onValueChange={(itemValue, itemIndex) => {
+            setSelectedFilter(itemValue);
+            if (itemValue === "none") {
+              console.log(itemValue)
+              setFilterCriteria(filterEntryId, "none")
+            }
+          }}
           style={styles.picker}
         >
           {
@@ -53,6 +73,22 @@ function Settings({ navigation }) {
             ))
           }
         </Picker>
+
+        {
+          selectedFilter == "name" &&
+          <View style={{ marginTop: 10 }}>
+            <TextInput
+              style={{ backgroundColor: "white", border: "1px solid black", fontSize: 20 }}
+              onChangeText={(value) => setNameFilter(value)}
+              onBlur={() => {
+                if (nameFilter.replace(/\s/g, '').length) { // whitespace only check
+                  setFilterCriteria(filterEntryId, "name", nameFilter);
+                }
+              }}
+              value={nameFilter}
+            />
+          </View>
+        }
 
         <View style={styles.separator} />
 

@@ -4,14 +4,6 @@ export const FILTER_OPTIONS_FRIENDLY = ["Kein Filter", "Name", "Kategorie", "Bew
 export const SORTING_OPTIONS_DB = ["name", "category", "rating", "last_cooked", "duration"];
 export const FILTER_OPTIONS_DB = ["none", "name", "category", "rating", "last_cooked", "duration"];
 
-export const SORTING_OPTIONS = {};
-
-SORTING_OPTIONS["name"] = "Name";
-SORTING_OPTIONS["category"] = "Kategorie";
-SORTING_OPTIONS["rating"] = "Bewertung";
-SORTING_OPTIONS["last_cooked"] = "Lange nicht zubereitet";
-SORTING_OPTIONS["duration"] = "Dauer";
-
 export function sortRecipesByCriteria(recipes, criteria) {
     switch (criteria) {
         case "name":
@@ -78,4 +70,15 @@ function compareByDuration(a, b) {
         return 1;
     }
     return 0;
+}
+
+export function filterRecipesByCriteria(recipes, filterCriteria) {
+    if (filterCriteria.type === "none") return recipes;
+
+    switch (filterCriteria.type) {
+        case "name":
+            return recipes.filter(recipe => recipe.name.toLowerCase().includes(filterCriteria.criteria.toLowerCase()));
+    }
+
+    return recipes;
 }
