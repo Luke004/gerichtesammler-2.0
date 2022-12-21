@@ -2,7 +2,7 @@ import { React, useState, useEffect } from "react";
 import { StyleSheet, Text, TextInput, View, TouchableOpacity } from "react-native";
 import { Picker } from '@react-native-picker/picker';
 import { SORTING_OPTIONS_FRIENDLY, SORTING_OPTIONS_DB, FILTER_OPTIONS_FRIENDLY, FILTER_OPTIONS_DB } from '../util/SettingsUtil';
-import { getSortingCriteria, setSortingCriteria, getFilterCriteria, setFilterCriteria } from '../util/DatabaseUtil';
+import { getSortingCriteria, setSortingCriteria, getFilterCriteria, setFilterCriteria, getAllCategories } from '../util/DatabaseUtil';
 
 let sortingEntryId;
 let filterEntryId;
@@ -10,10 +10,17 @@ let filterEntryId;
 function Settings({ navigation }) {
   const [selectedSorting, setSelectedSorting] = useState();
   const [selectedFilter, setSelectedFilter] = useState();
+  const [categories, setCategories] = useState();
 
   const [nameFilter, setNameFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+
 
   useEffect(() => {
+    getAllCategories((results) => {
+      setCategories(results);
+    })
+
     getSortingCriteria().then((result) => {
       setSelectedSorting(result.criteria);
       sortingEntryId = result.id;
@@ -26,6 +33,11 @@ function Settings({ navigation }) {
       switch (result.type) {
         case "name":
           setNameFilter(result.criteria);
+          break;
+        case "category":
+          console.log("result.criteria")
+          console.log(result.criteria)
+          setCategoryFilter(result.criteria);
           break;
       }
 
@@ -87,6 +99,26 @@ function Settings({ navigation }) {
               }}
               value={nameFilter}
             />
+          </View>
+        }
+
+        {
+          selectedFilter == "category" &&
+          <View style={{ marginTop: 10 }}>
+            <Picker
+              selectedValue={categoryFilter}
+              onValueChange={(itemValue, itemIndex) => {
+                setCategoryFilter(itemValue);
+                setFilterCriteria(filterEntryId, "category", itemValue);
+              }}
+              style={styles.picker}
+            >
+              {
+                categories.map((category, index) => (
+                  <Picker.Item label={category.name} value={category.category_id} key={index} />
+                ))
+              }
+            </Picker>
           </View>
         }
 

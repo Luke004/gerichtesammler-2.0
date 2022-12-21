@@ -78,6 +78,8 @@ export function filterRecipesByCriteria(recipes, filterCriteria) {
     switch (filterCriteria.type) {
         case "name":
             return recipes.filter(recipe => recipe.name.toLowerCase().includes(filterCriteria.criteria.toLowerCase()));
+        case "category":
+            return recipes.filter(recipe => recipe.category_id == filterCriteria.criteria);
     }
 
     return recipes;
