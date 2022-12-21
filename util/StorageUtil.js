@@ -63,9 +63,11 @@ export const deleteImagesFromStorage = async (images) => {
             }
         }
     }
-    console.log("assetsToDelete");
-    console.log(assetsToDelete);
-    MediaLibrary.deleteAssetsAsync(assetsToDelete);
+    MediaLibrary.deleteAssetsAsync(assetsToDelete).then((result) => {
+        if (result) {
+            console.log("Assets " + assetsToDelete + " successfully deleted.")
+        }
+    });
 };
 
 async function requestPermission() {

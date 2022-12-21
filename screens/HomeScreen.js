@@ -1,7 +1,7 @@
 import { React, useState, useEffect } from "react";
 import { Text, View, ImageBackground, ScrollView, TouchableOpacity } from "react-native";
 import { AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { AirbnbRating, Card } from '@rneui/themed';
+import { AirbnbRating, Card, Dialog } from '@rneui/themed';
 import { MenuTrigger, Menu, MenuOptions, MenuOption } from 'react-native-popup-menu';
 import { convertToReadableDurationInfo, convertToReadableLastCookedInfo } from "../util/RecipeUtil";
 import { getAllRecipes, getCategoryColorById, hasNoCategoriesInDatabase, markAsCooked, deleteRecipe } from '../util/DatabaseUtil'
@@ -9,6 +9,7 @@ import { getAllRecipes, getCategoryColorById, hasNoCategoriesInDatabase, markAsC
 const HomeScreen = ({ navigation }) => {
   const [recipes, setRecipes] = useState([]);
   const [hasNoCategories, setHasNoCategories] = useState(false);
+  const [removeRecipeDialogVisible, setRemoveRecipeDialogVisible] = useState(false);
 
   let contextMenuRefs = {};
 
@@ -52,6 +53,7 @@ const HomeScreen = ({ navigation }) => {
           r.recipe_id !== recipe_id
         )
       );
+      setRemoveRecipeDialogVisible(false);
     })
   }
 
@@ -93,11 +95,23 @@ const HomeScreen = ({ navigation }) => {
                   <MenuOptions customStyles={{ optionWrapper: { padding: 10 }, optionText: { fontSize: 20 } }} >
                     <MenuOption onSelect={() => handleMarkAsCooked(recipe.recipe_id)} text='Heute zubereitet' />
                     <MenuOption onSelect={() => handleEdit(recipe.recipe_id)} text='Bearbeiten' />
-                    <MenuOption onSelect={() => handleDelete(recipe.recipe_id)} >
+                    <MenuOption onSelect={() => setRemoveRecipeDialogVisible(true)} >
                       <Text style={{ fontWeight: "bold", fontSize: 20, color: "red" }}>Löschen</Text>
                     </MenuOption>
                   </MenuOptions>
                 </Menu>
+
+                <Dialog
+                  isVisible={removeRecipeDialogVisible}
+                  onBackdropPress={() => setRemoveRecipeDialogVisible(false)}
+                >
+                  <Dialog.Title title="Löschen bestätigen" />
+                  <Text>Rezept "{recipe ? recipe.name : ""}" wirklich löschen?</Text>
+                  <Dialog.Actions>
+                    <Dialog.Button title="Bestätigen" onPress={() => handleDelete(recipe.recipe_id)} />
+                    <Dialog.Button title="Abbrechen" onPress={() => setRemoveRecipeDialogVisible(false)} />
+                  </Dialog.Actions>
+                </Dialog>
 
                 <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
                   <View style={{ flexShrink: 1 }}>

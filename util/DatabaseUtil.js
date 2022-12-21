@@ -181,12 +181,12 @@ export function addImageToDatabase(recipeId, fileName) {
     });
 }
 
-async function removeAllImagesForRecipe(recipeId) {
+function removeAllImagesForRecipe(recipeId) {
     getRecipePictureNames(recipeId).then((images) => deleteImagesFromStorage(images));
 
     db.transaction((transaction) => {
         transaction.executeSql("DELETE FROM images WHERE recipe_id = ?;", [recipeId], (res, res2) => {
-            console.log(res2);
+            console.log("Deleted images rows for recipeId " + recipeId);
         }, (err) => {
             console.log(err);
         });

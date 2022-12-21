@@ -106,9 +106,6 @@ function NewRecipeScreen({ navigation }) {
     // save images (if exist)
     const imgFileNames = await saveImagesToStorage(images);
     if (imgFileNames) {
-      console.log("imgFileNames")
-      console.log(imgFileNames)
-
       imgFileNames.forEach((fileName) => {
         addImageToDatabase(recipeId, fileName);
       });
