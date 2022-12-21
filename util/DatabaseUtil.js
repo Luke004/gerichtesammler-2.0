@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 import { openDatabase } from 'expo-sqlite';
-
+import { deleteImagesFromStorage } from './StorageUtil';
 
 const db = openDatabase('myDb', "1.0");
 
@@ -181,6 +181,18 @@ export function addImageToDatabase(recipeId, fileName) {
     });
 }
 
+async function removeAllImagesForRecipe(recipeId) {
+    getRecipePictureNames(recipeId).then((images) => deleteImagesFromStorage(images));
+
+    db.transaction((transaction) => {
+        transaction.executeSql("DELETE FROM images WHERE recipe_id = ?;", [recipeId], (res, res2) => {
+            console.log(res2);
+        }, (err) => {
+            console.log(err);
+        });
+    }, (err) => console.log(err));
+}
+
 export function getRecipeById(id) {
     return new Promise(resolve => {
         db.readTransaction((transaction) => {
@@ -188,6 +200,24 @@ export function getRecipeById(id) {
                 if (Platform.OS == "web") {
                     resolve(res2.rows[0])
                 } else {
+                    resolve(res2.rows._array[0])
+                }
+            });
+        },
+            (error) => {
+                console.log(error);
+            });
+    });
+}
+
+export function deleteRecipe(id) {
+    return new Promise(resolve => {
+        db.transaction((transaction) => {
+            transaction.executeSql("DELETE FROM recipes WHERE recipe_id=?", [id], async (res, res2) => {
+                if (Platform.OS == "web") {
+                    resolve(res2.rows[0])
+                } else {
+                    removeAllImagesForRecipe(id);
                     resolve(res2.rows._array[0])
                 }
             });

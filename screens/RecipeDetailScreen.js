@@ -3,8 +3,8 @@ import { Text, View, ScrollView, Image, ImageBackground, TouchableHighlight, Mod
 import { WebView } from "react-native-webview";
 import { Card } from '@rneui/themed';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import * as MediaLibrary from 'expo-media-library';
 import { convertToReadableDurationInfo, convertToReadableLastCookedInfo } from "../util/RecipeUtil";
+import { getImageUris } from '../util/StorageUtil'
 import { getRecipePictureNames } from '../util/DatabaseUtil'
 
 const PAPER_BACKGROUND = require('../assets/backgrounds/old-paper.jpg');
@@ -37,20 +37,8 @@ function RecipeDetailScreen({ route, navigation }) {
   if (Platform.OS !== 'web') {
     useEffect(() => {
       const unsubscribe = navigation.addListener('focus', () => {
-        getRecipePictureNames(recipe.recipe_id).then(async (result) => {
-          const album = await MediaLibrary.getAlbumAsync("gerichtesammler");
-          const assets = (await MediaLibrary.getAssetsAsync({ album: album.id })).assets;
-
-          const uris = [];
-          for (let i = 0; i < result.length; ++i) {
-            for (let j = 0; j < assets.length; ++j) {
-              if (result[i].file_name == assets[j].filename) {
-                uris.push(assets[j].uri)
-                break;
-              }
-            }
-          }
-          setImageUris(uris);
+        getRecipePictureNames(recipe.recipe_id).then((images) => {
+          getImageUris(images).then((uris) => setImageUris(uris));
         });
       });
       return unsubscribe;

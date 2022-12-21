@@ -4,7 +4,7 @@ import { AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 import { AirbnbRating, Card } from '@rneui/themed';
 import { MenuTrigger, Menu, MenuOptions, MenuOption } from 'react-native-popup-menu';
 import { convertToReadableDurationInfo, convertToReadableLastCookedInfo } from "../util/RecipeUtil";
-import { getAllRecipes, getCategoryColorById, hasNoCategoriesInDatabase, markAsCooked } from '../util/DatabaseUtil'
+import { getAllRecipes, getCategoryColorById, hasNoCategoriesInDatabase, markAsCooked, deleteRecipe } from '../util/DatabaseUtil'
 
 const HomeScreen = ({ navigation }) => {
   const [recipes, setRecipes] = useState([]);
@@ -39,6 +39,20 @@ const HomeScreen = ({ navigation }) => {
 
   const handleMarkAsCooked = (recipe_id) => {
     markAsCooked(recipe_id).then(() => updateRecipe(recipe_id))
+  }
+
+  const handleEdit = (recipe_id) => {
+
+  }
+
+  const handleDelete = (recipe_id) => {
+    deleteRecipe(recipe_id).then(() => {
+      setRecipes(
+        recipes.filter(r =>
+          r.recipe_id !== recipe_id
+        )
+      );
+    })
   }
 
   const updateRecipe = (recipeId) => {
@@ -78,8 +92,8 @@ const HomeScreen = ({ navigation }) => {
                   <MenuTrigger />
                   <MenuOptions customStyles={{ optionWrapper: { padding: 10 }, optionText: { fontSize: 20 } }} >
                     <MenuOption onSelect={() => handleMarkAsCooked(recipe.recipe_id)} text='Heute zubereitet' />
-                    <MenuOption onSelect={() => alert(`Bearbeiten`)} text='Bearbeiten' />
-                    <MenuOption onSelect={() => alert(`Delete`)} >
+                    <MenuOption onSelect={() => handleEdit(recipe.recipe_id)} text='Bearbeiten' />
+                    <MenuOption onSelect={() => handleDelete(recipe.recipe_id)} >
                       <Text style={{ fontWeight: "bold", fontSize: 20, color: "red" }}>Löschen</Text>
                     </MenuOption>
                   </MenuOptions>
