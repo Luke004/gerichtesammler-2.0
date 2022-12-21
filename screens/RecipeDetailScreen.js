@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import { Text, View, ScrollView, Image, ImageBackground, TouchableHighlight, Modal, Dimensions } from "react-native";
+import { Text, View, ScrollView, Image, ImageBackground, TouchableHighlight, Modal, Dimensions, Platform } from "react-native";
 import { WebView } from "react-native-webview";
 import { Card } from '@rneui/themed';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -34,26 +34,28 @@ function RecipeDetailScreen({ route, navigation }) {
     paperBackground = PAPER_BACKGROUND_LARGE;
   }
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      getRecipePictureNames(recipe.recipe_id).then(async (result) => {
-        const album = await MediaLibrary.getAlbumAsync("gerichtesammler");
-        const assets = (await MediaLibrary.getAssetsAsync({ album: album.id })).assets;
+  if (Platform.OS !== 'web') {
+    useEffect(() => {
+      const unsubscribe = navigation.addListener('focus', () => {
+        getRecipePictureNames(recipe.recipe_id).then(async (result) => {
+          const album = await MediaLibrary.getAlbumAsync("gerichtesammler");
+          const assets = (await MediaLibrary.getAssetsAsync({ album: album.id })).assets;
 
-        const uris = [];
-        for (let i = 0; i < result.length; ++i) {
-          for (let j = 0; j < assets.length; ++j) {
-            if (result[i].file_name == assets[j].filename) {
-              uris.push(assets[j].uri)
-              break;
+          const uris = [];
+          for (let i = 0; i < result.length; ++i) {
+            for (let j = 0; j < assets.length; ++j) {
+              if (result[i].file_name == assets[j].filename) {
+                uris.push(assets[j].uri)
+                break;
+              }
             }
           }
-        }
-        setImageUris(uris);
+          setImageUris(uris);
+        });
       });
-    });
-    return unsubscribe;
-  }, [navigation]);
+      return unsubscribe;
+    }, [navigation]);
+  }
 
   const handleImagePress = (index) => {
     setZoomIndex(index);

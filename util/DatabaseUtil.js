@@ -139,13 +139,13 @@ export function removeCategoryFromDatabase(category, success) {
 
 export function createNewRecipe(recipe) {
     return new Promise(resolve => {
-        const query = `INSERT INTO recipes (name, instructions, category_id, rating, duration) 
+        const query = `INSERT INTO recipes (name, instructions, category_id, rating, duration, last_cooked) 
                     VALUES(?, ?, ?, ?, ?, ?);`
         db.transaction((transaction) => {
-            transaction.executeSql(query, [recipe.name, recipe.instructions, recipe.category, recipe.rating, recipe.duration], (res1, res2) => {
+            transaction.executeSql(query, [recipe.name, recipe.instructions, recipe.category, recipe.rating, recipe.duration, -1], (res1, res2) => {
                 resolve(res2.insertId);
             });
-        });
+        }, (error) => console.log(error));
     });
 }
 
@@ -219,7 +219,6 @@ export function markAsCooked(recipeId) {
     return new Promise(resolve => {
         db.transaction((transaction) => {
             transaction.executeSql("UPDATE recipes SET last_cooked = julianday('now') WHERE recipe_id = ?;", [recipeId], (res, res2) => {
-                console.log(res2.rows._array)
                 resolve();
             });
         },
@@ -231,6 +230,9 @@ export function markAsCooked(recipeId) {
 
 function getNumberOfDaysLastCooked(recipe) {
     return new Promise(resolve => {
+        if (recipe.last_cooked == -1) {
+            resolve(-1);
+        }
         db.transaction((transaction) => {
             transaction.executeSql("SELECT (julianday('now') - " + recipe.last_cooked + ");", undefined, (res, res2) => {
                 let daysSinceLastCooked;

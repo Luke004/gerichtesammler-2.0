@@ -224,7 +224,7 @@ function NewRecipeScreen({ navigation }) {
 
         <Button
           title="Rezept Hinzufügen"
-          onPress={handleAddNewRecipe}
+          onPress={() => handleAddNewRecipe()}
         />
 
         <Dialog

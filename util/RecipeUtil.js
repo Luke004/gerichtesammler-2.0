@@ -1,6 +1,10 @@
 export function convertToReadableLastCookedInfo(lastCooked, detailed = false) {
-    if (!lastCooked || lastCooked == 0) return detailed ? "noch nie" : "-";
-
+    if (lastCooked == -1) {
+        return detailed ? "noch nie" : "-";
+    }
+    if (lastCooked == 0) {
+        return "heute";
+    }
     if (lastCooked == 1) {
         return "gestern";
     }

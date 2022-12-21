@@ -37,6 +37,19 @@ const HomeScreen = ({ navigation }) => {
     return unsubscribe;
   }, [navigation]);
 
+  const handleMarkAsCooked = (recipe_id) => {
+    markAsCooked(recipe_id).then(() => updateRecipe(recipe_id))
+  }
+
+  const updateRecipe = (recipeId) => {
+    const myNextRecipes = [...recipes];
+    const recipe = myNextRecipes.find(
+      r => r.recipe_id === recipeId
+    );
+    recipe.last_cooked = 0;
+    setRecipes(myNextRecipes);
+  }
+
   const setContextMenuRef = (ref, index) => {
     contextMenuRefs[index] = ref;
   }
@@ -64,7 +77,7 @@ const HomeScreen = ({ navigation }) => {
                 <Menu ref={ref => setContextMenuRef(ref, index)}>
                   <MenuTrigger />
                   <MenuOptions customStyles={{ optionWrapper: { padding: 10 }, optionText: { fontSize: 20 } }} >
-                    <MenuOption onSelect={() => markAsCooked(recipe.recipe_id)} text='Heute zubereitet' />
+                    <MenuOption onSelect={() => handleMarkAsCooked(recipe.recipe_id)} text='Heute zubereitet' />
                     <MenuOption onSelect={() => alert(`Bearbeiten`)} text='Bearbeiten' />
                     <MenuOption onSelect={() => alert(`Delete`)} >
                       <Text style={{ fontWeight: "bold", fontSize: 20, color: "red" }}>Löschen</Text>
