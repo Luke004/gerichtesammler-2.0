@@ -25,11 +25,11 @@ const HomeScreen = ({ navigation }) => {
         for (let i = 0; i < results.length; ++i) {
           const recipe = results[i];
           // get and set category color
-          const category = await getCategoryColorById(recipe.category_id);
-          if (!cachedCategories[category.category_id]) {
-            cachedCategories[category.category_id] = category.color;
+          const categoryColor = await getCategoryColorById(recipe.category_id);
+          if (!cachedCategories[recipe.category_id]) {
+            cachedCategories[recipe.category_id] = categoryColor;
           }
-          recipe.categoryColor = cachedCategories[category.category_id];
+          recipe.categoryColor = cachedCategories[recipe.category_id];
         }
         setRecipes(results);
       })
@@ -42,8 +42,8 @@ const HomeScreen = ({ navigation }) => {
     markAsCooked(recipe_id).then(() => updateRecipe(recipe_id))
   }
 
-  const handleEdit = (recipe_id) => {
-
+  const handleEdit = (recipe) => {
+    navigation.navigate('EditRecipe', { recipe: recipe })
   }
 
   const handleDelete = (recipe_id) => {
@@ -94,7 +94,7 @@ const HomeScreen = ({ navigation }) => {
                   <MenuTrigger />
                   <MenuOptions customStyles={{ optionWrapper: { padding: 10 }, optionText: { fontSize: 20 } }} >
                     <MenuOption onSelect={() => handleMarkAsCooked(recipe.recipe_id)} text='Heute zubereitet' />
-                    <MenuOption onSelect={() => handleEdit(recipe.recipe_id)} text='Bearbeiten' />
+                    <MenuOption onSelect={() => handleEdit(recipe)} text='Bearbeiten' />
                     <MenuOption onSelect={() => setRemoveRecipeDialogVisible(true)} >
                       <Text style={{ fontWeight: "bold", fontSize: 20, color: "red" }}>Löschen</Text>
                     </MenuOption>

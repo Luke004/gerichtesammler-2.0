@@ -20,7 +20,7 @@ export const saveImagesToStorage = async (images) => {
     return imgFileNames;
 };
 
-export const getImageUris = async (images) => {
+export const getImageAssets = async (images) => {
     if (images.length == 0) return [];
 
     if (!await requestPermission()) {
@@ -30,17 +30,17 @@ export const getImageUris = async (images) => {
     const album = await MediaLibrary.getAlbumAsync("gerichtesammler");
     const assets = (await MediaLibrary.getAssetsAsync({ album: album.id })).assets;
 
-    const uris = [];
+    const myAssets = [];
     for (let i = 0; i < images.length; ++i) {
         for (let j = 0; j < assets.length; ++j) {
             if (images[i].file_name == assets[j].filename) {
-                uris.push(assets[j].uri)
+                myAssets.push(assets[j])
                 break;
             }
         }
     }
 
-    return uris;
+    return myAssets;
 }
 
 export const deleteImagesFromStorage = async (images) => {
@@ -66,6 +66,25 @@ export const deleteImagesFromStorage = async (images) => {
     MediaLibrary.deleteAssetsAsync(assetsToDelete).then((result) => {
         if (result) {
             console.log("Assets " + assetsToDelete + " successfully deleted.")
+        }
+    });
+};
+
+export const deleteAssetsFromStorage = async (assets) => {
+    if (assets.length == 0) return;
+
+    if (!await requestPermission()) {
+        return;
+    }
+
+    const deletedAssetIds = [];
+    assets.forEach((asset) => {
+        deletedAssetIds.push(asset.id);
+    });
+
+    MediaLibrary.deleteAssetsAsync(assets).then((result) => {
+        if (result) {
+            console.log("Assets " + deletedAssetIds + " successfully deleted.")
         }
     });
 };

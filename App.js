@@ -2,13 +2,14 @@ import React from "react";
 import { Button, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from "@react-navigation/stack";
-import { Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { MenuProvider } from 'react-native-popup-menu';
 import HomeScreen from "./screens/HomeScreen";
 import SettingScreen from "./screens/SettingScreen";
 import RecipeDetailScreen from "./screens/RecipeDetailScreen";
 import EditCategoriesScreen from "./screens/EditCategoriesScreen";
 import NewRecipeScreen from "./screens/NewRecipeScreen";
+import EditRecipeScreen from "./screens/EditRecipeScreen";
 import { initTables } from './util/DatabaseUtil';
 
 
@@ -65,7 +66,40 @@ export default function App() {
             })}
             component={NewRecipeScreen}
           />
-          <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen}></Stack.Screen>
+          <Stack.Screen
+            name="EditRecipe"
+            options={({ route }) => ({
+              title: route.params.recipe.name + " bearbeiten",
+              headerTitleStyle: {
+                color: "black"
+              },
+              headerStyle: {
+                backgroundColor: "lightgrey"
+              }
+            })}
+            component={EditRecipeScreen}
+          />
+          <Stack.Screen
+            name="RecipeDetail"
+            component={RecipeDetailScreen}
+            options={({ route, navigation }) => ({
+              title: "Rezeptansicht",
+              headerTitleStyle: {
+                color: "black"
+              },
+              headerStyle: {
+                backgroundColor: "lightgrey"
+              },
+              headerRight: () => (
+                <Feather name="edit"
+                  size={30}
+                  style={{ paddingRight: 10 }}
+                  color="#006600"
+                  onPress={() => navigation.navigate('EditRecipe', { recipe: route.params.recipe })}
+                />
+              ),
+            })}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </MenuProvider>

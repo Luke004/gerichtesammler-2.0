@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 import { openDatabase } from 'expo-sqlite';
-import { deleteImagesFromStorage } from './StorageUtil';
+import { deleteImagesFromStorage, deleteAssetsFromStorage } from './StorageUtil';
 
 const db = openDatabase('myDb', "1.0");
 
@@ -96,11 +96,11 @@ export function getAllCategories(results) {
 export function getCategoryColorById(id) {
     return new Promise(resolve => {
         db.readTransaction((transaction) => {
-            transaction.executeSql("SELECT category_id, color FROM categories WHERE category_id=?", [id], (res, res2) => {
+            transaction.executeSql("SELECT color FROM categories WHERE category_id=?", [id], (res, res2) => {
                 if (Platform.OS == "web") {
-                    resolve(res2.rows[0])
+                    resolve(res2.rows[0].color)
                 } else {
-                    resolve(res2.rows._array[0])
+                    resolve(res2.rows._array[0].color)
                 }
             });
         },
@@ -149,6 +149,13 @@ export function createNewRecipe(recipe) {
     });
 }
 
+export function updateRecipe(recipe, id) {
+    const query = `UPDATE recipes SET name = ?, instructions = ?, category_id = ?, rating = ?, duration = ? WHERE recipe_id = ?;`
+    db.transaction((transaction) => {
+        transaction.executeSql(query, [recipe.name, recipe.instructions, recipe.category, recipe.rating, recipe.duration, id]);
+    }, (error) => console.log(error));
+}
+
 export function getAllRecipes(results) {
     db.readTransaction((transaction) => {
         transaction.executeSql("SELECT * FROM recipes", undefined, async (res, res2) => {
@@ -193,10 +200,26 @@ function removeAllImagesForRecipe(recipeId) {
     }, (err) => console.log(err));
 }
 
+export function removeImageAssetsForRecipe(recipeId, imageAssets) {
+    imageAssets.forEach((asset) => {
+        db.transaction((transaction) => {
+            transaction.executeSql("DELETE FROM images WHERE recipe_id = ? AND file_name = ?;", [recipeId, asset.filename],
+            undefined,
+            (err) => {
+                console.log(err);
+            });
+        }, (err) => console.log(err), () => {
+            console.log("Deleted image row " + asset.id + " for recipeId " + recipeId);
+        });
+    });
+
+    deleteAssetsFromStorage(imageAssets);
+}
+
 export function getRecipeById(id) {
     return new Promise(resolve => {
         db.readTransaction((transaction) => {
-            transaction.executeSql("SELECT * FROM recipes WHERE category_id=?", [id], (res, res2) => {
+            transaction.executeSql("SELECT * FROM recipes WHERE recipe_id=?", [id], (res, res2) => {
                 if (Platform.OS == "web") {
                     resolve(res2.rows[0])
                 } else {

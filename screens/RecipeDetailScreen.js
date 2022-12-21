@@ -4,7 +4,7 @@ import { WebView } from "react-native-webview";
 import { Card } from '@rneui/themed';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { convertToReadableDurationInfo, convertToReadableLastCookedInfo } from "../util/RecipeUtil";
-import { getImageUris } from '../util/StorageUtil'
+import { getImageAssets } from '../util/StorageUtil'
 import { getRecipePictureNames } from '../util/DatabaseUtil'
 
 const PAPER_BACKGROUND = require('../assets/backgrounds/old-paper.jpg');
@@ -13,7 +13,7 @@ const PAPER_BACKGROUND_LARGE = require('../assets/backgrounds/old-paper-large.jp
 
 
 function RecipeDetailScreen({ route, navigation }) {
-  const [imageUris, setImageUris] = useState([]);
+  const [imageAssets, setImageAssets] = useState([]);
   const [zoomIndex, setZoomIndex] = useState(0);
   const [imageZoomViewVisible, setImageZoomViewVisible] = useState(false);
 
@@ -24,6 +24,9 @@ function RecipeDetailScreen({ route, navigation }) {
   };
 
   const recipe = route.params.recipe;
+
+  console.log("recipe")
+  console.log(route.params)
 
   let paperBackground;
   if (recipe.instructions.length < 250) {
@@ -38,7 +41,7 @@ function RecipeDetailScreen({ route, navigation }) {
     useEffect(() => {
       const unsubscribe = navigation.addListener('focus', () => {
         getRecipePictureNames(recipe.recipe_id).then((images) => {
-          getImageUris(images).then((uris) => setImageUris(uris));
+          getImageAssets(images).then((assets) => setImageAssets(assets));
         });
       });
       return unsubscribe;
@@ -87,14 +90,14 @@ function RecipeDetailScreen({ route, navigation }) {
             </View>
 
             {
-              imageUris.map((imageUri, index) => (
+              imageAssets.map((imageAsset, index) => (
                 <TouchableHighlight key={index} onPress={() => handleImagePress(index)}>
-                  <Image source={{ uri: imageUri }} style={{ width: "100%", maxHeight: 400, aspectRatio: 1, marginBottom: 10 }} />
+                  <Image source={{ uri: imageAsset.uri }} style={{ width: "100%", maxHeight: 400, aspectRatio: 1, marginBottom: 10 }} />
                 </TouchableHighlight>
               ))
             }
 
-            {imageUris.length > 0 &&
+            {imageAssets.length > 0 &&
               <Modal
                 animationType={"fade"}
                 transparent={false}
@@ -111,7 +114,7 @@ function RecipeDetailScreen({ route, navigation }) {
                   <WebView
                     allowFileAccess={true}
                     onLoad={onLoadWebView}
-                    source={webViewRenderedOnce ? { uri: imageUris[zoomIndex] } : undefined}
+                    source={webViewRenderedOnce ? { uri: imageAssets[zoomIndex].uri } : undefined}
                     style={{
                       height: Math.round(Dimensions.get("window").height),
                       width: Math.round(Dimensions.get("window").width),
