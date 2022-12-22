@@ -9,6 +9,7 @@ import { sortRecipesByCriteria, filterRecipesByCriteria } from '../util/Settings
 
 const HomeScreen = ({ navigation }) => {
   const [recipes, setRecipes] = useState([]);
+  const [selectedRecipe, setSelectedRecipe] = useState();
   const [hasNoCategories, setHasNoCategories] = useState(false);
   const [removeRecipeDialogVisible, setRemoveRecipeDialogVisible] = useState(false);
 
@@ -94,7 +95,10 @@ const HomeScreen = ({ navigation }) => {
           recipes.map((recipe, index) => (
             <TouchableOpacity key={recipe.recipe_id}
               onPress={() => navigation.navigate('RecipeDetail', { recipe: recipe })}
-              onLongPress={() => contextMenuRefs[index].open()}
+              onLongPress={() => {
+                contextMenuRefs[index].open();
+                setSelectedRecipe(recipe);
+              }}
             >
               <Card containerStyle={{
                 margin: 0, paddingVertical: 7, paddingHorizontal: 15, backgroundColor: "white"
@@ -110,18 +114,6 @@ const HomeScreen = ({ navigation }) => {
                     </MenuOption>
                   </MenuOptions>
                 </Menu>
-
-                <Dialog
-                  isVisible={removeRecipeDialogVisible}
-                  onBackdropPress={() => setRemoveRecipeDialogVisible(false)}
-                >
-                  <Dialog.Title title="Löschen bestätigen" />
-                  <Text>Rezept "{recipe.name}" wirklich löschen?</Text>
-                  <Dialog.Actions>
-                    <Dialog.Button title="Bestätigen" onPress={() => handleDelete(recipe.recipe_id)} />
-                    <Dialog.Button title="Abbrechen" onPress={() => setRemoveRecipeDialogVisible(false)} />
-                  </Dialog.Actions>
-                </Dialog>
 
                 <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
                   <View style={{ flexShrink: 1 }}>
@@ -163,6 +155,22 @@ const HomeScreen = ({ navigation }) => {
         }
 
       </ScrollView>
+
+
+      {
+        selectedRecipe &&
+        <Dialog
+          isVisible={removeRecipeDialogVisible}
+          onBackdropPress={() => setRemoveRecipeDialogVisible(false)}
+        >
+          <Dialog.Title title="Löschen bestätigen" />
+          <Text>Rezept "{selectedRecipe.name}" wirklich löschen?</Text>
+          <Dialog.Actions>
+            <Dialog.Button title="Bestätigen" onPress={() => handleDelete(selectedRecipe.recipe_id)} />
+            <Dialog.Button title="Abbrechen" onPress={() => setRemoveRecipeDialogVisible(false)} />
+          </Dialog.Actions>
+        </Dialog>
+      }
 
 
 
