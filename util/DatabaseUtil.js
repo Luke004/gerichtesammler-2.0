@@ -64,11 +64,13 @@ export function initTables() {
                 initSortingCriteria();
             }
         });
+        /*
         getFilterCriteria().then((res) => {
             if (!res) {
                 initFilterCriteria();
             }
         });
+        */
     });
     //dropTable();
 }
@@ -83,10 +85,12 @@ function initSortingCriteria() {
         (error) => console.log(error));
 }
 
+/*
 function initFilterCriteria() {
     db.transaction((transaction) => { transaction.executeSql("INSERT INTO config_filter (type) VALUES(?);", FILTER_OPTIONS_DB[0]) },
         (error) => console.log(error));
 }
+*/
 
 export function getSortingCriteria() {
     return new Promise(resolve => {
@@ -107,17 +111,17 @@ export function getSortingCriteria() {
     });
 }
 
-export function getFilterCriteria() {
+export function getFilters() {
     return new Promise(resolve => {
         db.readTransaction((transaction) => {
             transaction.executeSql("SELECT * FROM config_filter", undefined, (res, res2) => {
                 let rows;
                 if (Platform.OS == "web") {
-                    rows = res2.rows[0];
+                    rows = res2.rows;
                 } else {
-                    rows = res2.rows._array[0];
+                    rows = res2.rows._array;
                 }
-                resolve(rows ? { id: rows.filter_id, type: rows.type, criteria: rows.criteria } : undefined);
+                resolve(rows ? rows : undefined);
             });
         },
             (error) => {

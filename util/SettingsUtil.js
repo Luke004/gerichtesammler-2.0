@@ -1,8 +1,8 @@
 export const SORTING_OPTIONS_FRIENDLY = ["Name", "Kategorie", "Bewertung", "Lange nicht zubereitet", "Dauer"];
-export const FILTER_OPTIONS_FRIENDLY = ["Kein Filter", "Name", "Kategorie", "Bewertung", "Zubereitet", "Dauer"];
+export const FILTER_OPTIONS_FRIENDLY = ["Name", "Kategorie", "Bewertung", "Zubereitet", "Dauer"];
 
 export const SORTING_OPTIONS_DB = ["name", "category", "rating", "last_cooked", "duration"];
-export const FILTER_OPTIONS_DB = ["none", "name", "category", "rating", "last_cooked", "duration"];
+export const FILTER_OPTIONS_DB = ["name", "category", "rating", "last_cooked", "duration"];
 
 export function sortRecipesByCriteria(recipes, criteria) {
     switch (criteria) {

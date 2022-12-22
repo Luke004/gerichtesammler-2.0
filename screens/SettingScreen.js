@@ -1,25 +1,30 @@
 import { React, useState, useEffect } from "react";
 import { StyleSheet, Text, TextInput, View, TouchableOpacity } from "react-native";
 import { Picker } from '@react-native-picker/picker';
+import { AntDesign } from '@expo/vector-icons';
 import { SORTING_OPTIONS_FRIENDLY, SORTING_OPTIONS_DB, FILTER_OPTIONS_FRIENDLY, FILTER_OPTIONS_DB } from '../util/SettingsUtil';
 import { getSortingCriteria, setSortingCriteria, getFilterCriteria, setFilterCriteria, getAllCategories } from '../util/DatabaseUtil';
+
+import { NameFilter } from '../components/filters/NameFilter';
+import { CategoryFilter } from '../components/filters/CategoryFilter';
+import { RatingFilter } from '../components/filters/RatingFilter';
+import { LastCookedFilter } from '../components/filters/LastCookedFilter';
+import { DurationFilter } from '../components/filters/DurationFilter';
 
 let sortingEntryId;
 let filterEntryId;
 
 function Settings({ navigation }) {
   const [selectedSorting, setSelectedSorting] = useState();
-  const [selectedFilter, setSelectedFilter] = useState();
-  const [categories, setCategories] = useState();
+  const [selectedFilter, setSelectedFilter] = useState(0);
 
-  const [nameFilter, setNameFilter] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
+  const [nameFilterIds, setNameFilterIds] = useState([]);
+
 
 
   useEffect(() => {
-    getAllCategories((results) => {
-      setCategories(results);
-    })
+    setSelectedFilter(FILTER_OPTIONS_DB[0]); // TODO change with actual DB data
+    /*
 
     getSortingCriteria().then((result) => {
       setSelectedSorting(result.criteria);
@@ -40,13 +45,45 @@ function Settings({ navigation }) {
       }
 
     });
+    */
 
   }, []);
 
-  return (
-    <View style={{ flex: 1, padding: 20 }}>
 
-      <View style={{ alignItems: "center" }}>
+  const addNewFilter = () => {
+    switch (selectedFilter) {
+      case "name":
+        setNameFilterIds([...nameFilterIds, nameFilterIds.length]);
+        break;
+      case "category":
+      case "rating":
+      case "last_cooked":
+      case "duration":
+    }
+  };
+
+  let myNameFilterArray = nameFilterIds.map((item, key) => {
+    return (
+      <NameFilter key={item} onBlur={(a) => console.log(item)} ></NameFilter>
+    );
+  });
+
+
+  return (
+
+    <View style={{ width: "100%", padding: 30 }}>
+
+      <View style={{ width: "100%", alignItems: "center" }}>
+
+        <TouchableOpacity
+          style={styles.editCategoriesButton}
+          onPress={() => navigation.navigate('EditCategories')}
+          underlayColor='#fff'>
+          <Text style={styles.editCategoriesButtonText}>Kategorien bearbeiten</Text>
+        </TouchableOpacity>
+
+        <View style={styles.separator} />
+
         <Text style={styles.pickerInfoText}>Sortieren nach:</Text>
         <Picker
           selectedValue={selectedSorting}
@@ -65,64 +102,36 @@ function Settings({ navigation }) {
 
         <View style={styles.separator} />
 
-        <Text style={styles.pickerInfoText}>Filtern nach:</Text>
-        <Picker
-          selectedValue={selectedFilter}
-          onValueChange={(itemValue, itemIndex) => {
-            setSelectedFilter(itemValue);
-            if (itemValue === "none") {
-              setFilterCriteria(filterEntryId, "none")
+        <Text style={styles.pickerInfoText}>Filter:</Text>
+        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+          <Picker
+            selectedValue={selectedFilter}
+            onValueChange={(itemValue, itemIndex) => {
+              setSelectedFilter(itemValue);
+            }}
+            style={[styles.picker, { marginRight: 5 }]}
+          >
+            {
+              FILTER_OPTIONS_FRIENDLY.map((filterOption, index) => (
+                <Picker.Item label={filterOption} value={FILTER_OPTIONS_DB[index]} key={index} />
+              ))
             }
-          }}
-          style={styles.picker}
-        >
-          {
-            FILTER_OPTIONS_FRIENDLY.map((filterOption, index) => (
-              <Picker.Item label={filterOption} value={FILTER_OPTIONS_DB[index]} key={index} />
-            ))
-          }
-        </Picker>
+          </Picker>
+          <AntDesign name="pluscircleo"
+            size={30}
+            color="#006600"
+            onPress={() => addNewFilter()}
+          />
+        </View>
 
         {
-          selectedFilter == "name" &&
-            <TextInput
-              style={{ width: "90%", backgroundColor: "white", border: "1px solid black", fontSize: 20, marginTop: 10 }}
-              onChangeText={(value) => setNameFilter(value)}
-              onBlur={() => {
-                if (nameFilter.replace(/\s/g, '').length) { // whitespace only check
-                  setFilterCriteria(filterEntryId, "name", nameFilter);
-                }
-              }}
-              value={nameFilter}
-            />
+          myNameFilterArray
         }
 
-        {
-          selectedFilter == "category" &&
-            <Picker
-              selectedValue={categoryFilter}
-              onValueChange={(itemValue, itemIndex) => {
-                setCategoryFilter(itemValue);
-                setFilterCriteria(filterEntryId, "category", itemValue);
-              }}
-              style={[styles.picker, { marginTop: 10 }]}
-            >
-              {
-                categories.map((category, index) => (
-                  <Picker.Item label={category.name} value={category.category_id} key={index} />
-                ))
-              }
-            </Picker>
-        }
-
-        <View style={styles.separator} />
-
-        <TouchableOpacity
-          style={styles.editCategoriesButton}
-          onPress={() => navigation.navigate('EditCategories')}
-          underlayColor='#fff'>
-          <Text style={styles.editCategoriesButtonText}>Kategorien bearbeiten</Text>
-        </TouchableOpacity>
+        <CategoryFilter></CategoryFilter>
+        <RatingFilter></RatingFilter>
+        <LastCookedFilter></LastCookedFilter>
+        <DurationFilter></DurationFilter>
 
       </View>
 
@@ -137,6 +146,9 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     width: "100%"
   },
+  filterSeparator: {
+    width: "30%"
+  },
   editCategoriesButton: {
     backgroundColor: '#1E6738',
     padding: 10
@@ -147,7 +159,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   picker: {
-    width: "90%",
+    width: 230,
     backgroundColor: "white",
     fontSize: 18,
     padding: 5
