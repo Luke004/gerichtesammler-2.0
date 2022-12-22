@@ -1,5 +1,4 @@
-import React from "react";
-import { Button, View } from 'react-native';
+import { React, useLayoutEffect } from "react";
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from "@react-navigation/stack";
 import { Feather, Ionicons } from "@expo/vector-icons";
@@ -16,7 +15,10 @@ import { initTables } from './util/DatabaseUtil';
 const Stack = createStackNavigator();
 
 export default function App() {
-  initTables();
+
+  useLayoutEffect(() => {
+    initTables();
+  }, []);
 
   return (
     <MenuProvider>
@@ -26,7 +28,7 @@ export default function App() {
             name="Home"
             component={HomeScreen}
             options={({ navigation }) => ({
-              title: 'Gerichtesammler 2.0',
+              title: 'Gerichtesammler',
               headerTitleStyle: {
                 color: "black"
               },

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "gerichtesammler-2.0",
-    "slug": "gerichtesammler-2.0",
+    "name": "gerichtesammler",
+    "slug": "gerichtesammler",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -24,10 +24,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.luke04.gerichtesammler"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3202697a-ac35-4645-b155-a3cd26c56f1f"
+      }
     }
   }
 }
