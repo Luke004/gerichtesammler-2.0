@@ -141,7 +141,7 @@ export function setSortingCriteria(id, criteria) {
 export function setFilterCriteria(id, type, criteria) {
     return new Promise(resolve => {
         db.transaction((transaction) => {
-            transaction.executeSql("UPDATE config_filter SET type = ?, criteria = ? WHERE filter_id = ?;", [type, criteria, id]);
+            transaction.executeSql("UPDATE config_filter SET type = ?, criteria = ? WHERE filter_id = ?;", [type, criteria ? criteria.toString() : undefined, id]);
         },
             (error) => {
                 console.log(error);

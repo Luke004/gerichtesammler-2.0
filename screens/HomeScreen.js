@@ -116,7 +116,7 @@ const HomeScreen = ({ navigation }) => {
                   onBackdropPress={() => setRemoveRecipeDialogVisible(false)}
                 >
                   <Dialog.Title title="Löschen bestätigen" />
-                  <Text>Rezept "{recipe ? recipe.name : ""}" wirklich löschen?</Text>
+                  <Text>Rezept "{recipe.name}" wirklich löschen?</Text>
                   <Dialog.Actions>
                     <Dialog.Button title="Bestätigen" onPress={() => handleDelete(recipe.recipe_id)} />
                     <Dialog.Button title="Abbrechen" onPress={() => setRemoveRecipeDialogVisible(false)} />

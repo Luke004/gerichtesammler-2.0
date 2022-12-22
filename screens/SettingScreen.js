@@ -26,18 +26,16 @@ function Settings({ navigation }) {
       sortingEntryId = result.id;
     });
 
-    getFilterCriteria().then((result) => {
-      setSelectedFilter(result.type);
-      filterEntryId = result.id;
+    getFilterCriteria().then((filter) => {
+      setSelectedFilter(filter.type);
+      filterEntryId = filter.id;
 
-      switch (result.type) {
+      switch (filter.type) {
         case "name":
-          setNameFilter(result.criteria);
+          setNameFilter(filter.criteria);
           break;
         case "category":
-          console.log("result.criteria")
-          console.log(result.criteria)
-          setCategoryFilter(result.criteria);
+          setCategoryFilter(Number(filter.criteria));
           break;
       }
 
@@ -48,7 +46,7 @@ function Settings({ navigation }) {
   return (
     <View style={{ flex: 1, padding: 20 }}>
 
-      <View style={{ width: "100%", alignItems: "center" }}>
+      <View style={{ alignItems: "center" }}>
         <Text style={styles.pickerInfoText}>Sortieren nach:</Text>
         <Picker
           selectedValue={selectedSorting}
@@ -73,7 +71,6 @@ function Settings({ navigation }) {
           onValueChange={(itemValue, itemIndex) => {
             setSelectedFilter(itemValue);
             if (itemValue === "none") {
-              console.log(itemValue)
               setFilterCriteria(filterEntryId, "none")
             }
           }}
@@ -88,9 +85,8 @@ function Settings({ navigation }) {
 
         {
           selectedFilter == "name" &&
-          <View style={{ marginTop: 10 }}>
             <TextInput
-              style={{ backgroundColor: "white", border: "1px solid black", fontSize: 20 }}
+              style={{ width: "90%", backgroundColor: "white", border: "1px solid black", fontSize: 20, marginTop: 10 }}
               onChangeText={(value) => setNameFilter(value)}
               onBlur={() => {
                 if (nameFilter.replace(/\s/g, '').length) { // whitespace only check
@@ -99,19 +95,17 @@ function Settings({ navigation }) {
               }}
               value={nameFilter}
             />
-          </View>
         }
 
         {
           selectedFilter == "category" &&
-          <View style={{ marginTop: 10 }}>
             <Picker
               selectedValue={categoryFilter}
               onValueChange={(itemValue, itemIndex) => {
                 setCategoryFilter(itemValue);
                 setFilterCriteria(filterEntryId, "category", itemValue);
               }}
-              style={styles.picker}
+              style={[styles.picker, { marginTop: 10 }]}
             >
               {
                 categories.map((category, index) => (
@@ -119,7 +113,6 @@ function Settings({ navigation }) {
                 ))
               }
             </Picker>
-          </View>
         }
 
         <View style={styles.separator} />
@@ -142,7 +135,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: 'lightgrey',
     marginVertical: 20,
-    width: "50%"
+    width: "100%"
   },
   editCategoriesButton: {
     backgroundColor: '#1E6738',
@@ -154,6 +147,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   picker: {
+    width: "90%",
+    backgroundColor: "white",
     fontSize: 18,
     padding: 5
   },
