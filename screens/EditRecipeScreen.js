@@ -7,7 +7,7 @@ import { Picker } from '@react-native-picker/picker';
 import { saveImagesToStorage, getImageAssets } from '../util/StorageUtil';
 import { AirbnbRating } from '@rneui/themed';
 import * as ImagePicker from 'expo-image-picker';
-import { updateRecipe, getAllCategories, getRecipePictureNames, addImageToDatabase, removeImageAssetsForRecipe, getCategoryColorById } from '../util/DatabaseUtil';
+import { updateRecipe, getAllCategories, getRecipePictureData, addImageToDatabase, removeImageAssetsForRecipe, getCategoryColorById } from '../util/DatabaseUtil';
 
 let imageAssetsToRemove = [];
 
@@ -35,7 +35,7 @@ function EditRecipeScreen({ route, navigation }) {
       })
 
       if (Platform.OS !== "web") {
-        getRecipePictureNames(recipe.recipe_id).then((images) => {
+        getRecipePictureData(recipe.recipe_id).then((images) => {
           getImageAssets(images).then((assets) => setImageAssets(assets));
         });
       }
@@ -128,10 +128,10 @@ function EditRecipeScreen({ route, navigation }) {
       }
     })
 
-    const imgFileNames = await saveImagesToStorage(newImageAssets);
-    if (imgFileNames) {
-      imgFileNames.forEach((fileName) => {
-        addImageToDatabase(recipe.recipe_id, fileName);
+    const imgData = await saveImagesToStorage(newImageAssets);
+    if (imgData) {
+      imgData.forEach((img) => {
+        addImageToDatabase(recipe.recipe_id, img);
       });
     }
 

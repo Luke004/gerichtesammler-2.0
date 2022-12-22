@@ -10,14 +10,14 @@ export const saveImagesToStorage = async (images) => {
     }
 
     // save images to storage
-    const imgFileNames = [];
+    const imgData = [];
     for (let i = 0; i < images.length; ++i) {
         const asset = await MediaLibrary.createAssetAsync(images[i].uri);
-        imgFileNames.push(asset.filename);
+        imgData.push({ filename: asset.filename, created: asset.creationTime });
         MediaLibrary.createAlbumAsync(IMAGES_ALBUM_NAME, asset, false);
     }
 
-    return imgFileNames;
+    return imgData;
 };
 
 export const getImageAssets = async (images) => {
@@ -26,21 +26,9 @@ export const getImageAssets = async (images) => {
     if (!await requestPermission()) {
         return;
     }
+    const assets = await findAssetsForImageData(images);
 
-    const album = await MediaLibrary.getAlbumAsync("gerichtesammler");
-    const assets = (await MediaLibrary.getAssetsAsync({ album: album.id })).assets;
-
-    const myAssets = [];
-    for (let i = 0; i < images.length; ++i) {
-        for (let j = 0; j < assets.length; ++j) {
-            if (images[i].file_name == assets[j].filename) {
-                myAssets.push(assets[j])
-                break;
-            }
-        }
-    }
-
-    return myAssets;
+    return assets;
 }
 
 export const deleteImagesFromStorage = async (images) => {
@@ -50,22 +38,12 @@ export const deleteImagesFromStorage = async (images) => {
         return;
     }
 
-    // delete images from storage
-    const album = await MediaLibrary.getAlbumAsync("gerichtesammler");
-    const assets = (await MediaLibrary.getAssetsAsync({ album: album.id })).assets;
-
-    const assetsToDelete = [];
-    for (let i = 0; i < images.length; ++i) {
-        for (let j = 0; j < assets.length; ++j) {
-            if (images[i].file_name == assets[j].filename) {
-                assetsToDelete.push(assets[j].id);
-                break;
-            }
-        }
-    }
-    MediaLibrary.deleteAssetsAsync(assetsToDelete).then((result) => {
+    const assets = await findAssetsForImageData(images);
+    const assetsIdsToDelete = assets.map(asset => asset.id);
+    
+    MediaLibrary.deleteAssetsAsync(assetsIdsToDelete).then((result) => {
         if (result) {
-            console.log("Assets " + assetsToDelete + " successfully deleted.")
+            console.log("Assets " + assetsIdsToDelete + " successfully deleted.")
         }
     });
 };
@@ -77,10 +55,7 @@ export const deleteAssetsFromStorage = async (assets) => {
         return;
     }
 
-    const deletedAssetIds = [];
-    assets.forEach((asset) => {
-        deletedAssetIds.push(asset.id);
-    });
+    const deletedAssetIds = assets.map(asset => asset.id);
 
     MediaLibrary.deleteAssetsAsync(assets).then((result) => {
         if (result) {
@@ -96,4 +71,56 @@ async function requestPermission() {
         return false;
     }
     return true;
+}
+
+async function findAssetsForImageData(imgData) {
+    const earliestCreationTime = Math.min(...imgData.map(img => img.created));
+    const album = await MediaLibrary.getAlbumAsync("gerichtesammler");
+    const assetData = await MediaLibrary.getAssetsAsync({ album: album.id, createdAfter: earliestCreationTime - 1 });
+
+    let assets = assetData.assets;
+    let imgsNotFound = [];
+
+    const myAssets = [];
+
+    for (const img of imgData) {
+        const asset = assets.find(asset => asset.filename === img.file_name);
+        if (asset) {
+            myAssets.push(asset);
+        } else {
+            imgsNotFound.push(img);
+        }
+    }
+
+    if (imgsNotFound.length > 0 && assetData.hasNextPage) {
+        const missingAssets = getMoreAssetsUntilAllImagesAreFound(album.id, assetData.endCursor, imgsNotFound);
+        myAssets = [...myAssets, ...missingAssets];
+    }
+
+    return myAssets;
+}
+
+async function getMoreAssetsUntilAllImagesAreFound(albumId, endCursorAsset, imgsNotFound) {
+    const foundAssets = [];
+    const numOfAssetsToFind = imgsNotFound.length;
+
+    while (foundAssets.length < numOfAssetsToFind) {
+        const moreAssetData = await MediaLibrary.getAssetsAsync({ album: albumId, after: endCursorAsset });
+        let assets = moreAssetData.assets;
+        let imgsStillNotFound = [];
+
+        for (const img of imgsNotFound) {
+            const asset = assets.find(asset => asset.filename === img.file_name);
+            if (asset) {
+                foundAssets.push(asset);
+            } else {
+                imgsStillNotFound.push(img);
+            }
+        }
+        endCursorAsset = moreAssetData.endCursor;
+        imgsNotFound = imgsStillNotFound;
+        if (!moreAssetData.hasNextPage) break;
+    }
+
+    return foundAssets;
 }

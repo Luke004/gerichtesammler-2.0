@@ -104,10 +104,10 @@ function NewRecipeScreen({ navigation }) {
     const recipeId = await createNewRecipe(recipe);
 
     // save images (if exist)
-    const imgFileNames = await saveImagesToStorage(images);
-    if (imgFileNames) {
-      imgFileNames.forEach((fileName) => {
-        addImageToDatabase(recipeId, fileName);
+    const imgData = await saveImagesToStorage(images);
+    if (imgData) {
+      imgData.forEach((img) => {
+        addImageToDatabase(recipeId, img);
       });
     }
 

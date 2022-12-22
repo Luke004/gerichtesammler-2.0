@@ -27,6 +27,7 @@ export function initTables() {
             image_id INTEGER PRIMARY KEY,
             recipe_id INTEGER NOT NULL,
             file_name TINYTEXT NOT NULL,
+            created INTEGER,
             FOREIGN KEY(recipe_id) REFERENCES recipes(recipe_id)
     );`,
         `CREATE TABLE IF NOT EXISTS config_sorting (
@@ -276,14 +277,14 @@ export function getAllRecipes(results) {
         });
 }
 
-export function addImageToDatabase(recipeId, fileName) {
+export function addImageToDatabase(recipeId, img) {
     db.transaction((transaction) => {
-        transaction.executeSql("INSERT INTO images (recipe_id, file_name) VALUES(?, ?);", [recipeId, fileName]);
+        transaction.executeSql("INSERT INTO images (recipe_id, file_name, created) VALUES(?, ?, ?);", [recipeId, img.filename, img.created]);
     });
 }
 
 function removeAllImagesForRecipe(recipeId) {
-    getRecipePictureNames(recipeId).then((images) => deleteImagesFromStorage(images));
+    getRecipePictureData(recipeId).then((images) => deleteImagesFromStorage(images));
 
     db.transaction((transaction) => {
         transaction.executeSql("DELETE FROM images WHERE recipe_id = ?;", [recipeId], (res, res2) => {
@@ -345,10 +346,10 @@ export function deleteRecipe(id) {
     });
 }
 
-export function getRecipePictureNames(recipeId) {
+export function getRecipePictureData(recipeId) {
     return new Promise(resolve => {
         db.readTransaction((transaction) => {
-            transaction.executeSql("SELECT file_name FROM images WHERE recipe_id=?", [recipeId], (res, res2) => {
+            transaction.executeSql("SELECT file_name, created FROM images WHERE recipe_id=?", [recipeId], (res, res2) => {
                 if (Platform.OS == "web") {
                     resolve(res2.rows)
                 } else {

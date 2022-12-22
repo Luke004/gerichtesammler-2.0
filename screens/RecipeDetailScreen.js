@@ -5,7 +5,7 @@ import { Card } from '@rneui/themed';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { convertToReadableDurationInfo, convertToReadableLastCookedInfo } from "../util/RecipeUtil";
 import { getImageAssets } from '../util/StorageUtil'
-import { getRecipePictureNames } from '../util/DatabaseUtil'
+import { getRecipePictureData } from '../util/DatabaseUtil'
 
 const PAPER_BACKGROUND = require('../assets/backgrounds/old-paper.jpg');
 const PAPER_BACKGROUND_SMALL = require('../assets/backgrounds/old-paper-small.jpg');
@@ -37,7 +37,7 @@ function RecipeDetailScreen({ route, navigation }) {
   if (Platform.OS !== 'web') {
     useEffect(() => {
       const unsubscribe = navigation.addListener('focus', () => {
-        getRecipePictureNames(recipe.recipe_id).then((images) => {
+        getRecipePictureData(recipe.recipe_id).then((images) => {
           getImageAssets(images).then((assets) => setImageAssets(assets));
         });
       });
