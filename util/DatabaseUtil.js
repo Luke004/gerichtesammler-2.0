@@ -72,6 +72,11 @@ export function initTables() {
 function dropTable() {
     db.transaction((transaction) => { transaction.executeSql("DROP TABLE categories;") },
         (error) => console.log(error));
+    db.transaction((transaction) => { transaction.executeSql("DROP TABLE recipes;") },
+        (error) => console.log(error));
+    db.transaction((transaction) => { transaction.executeSql("DROP TABLE images;") },
+        (error) => console.log(error));
+
 }
 
 function initSortingCriteria() {
@@ -183,6 +188,24 @@ export function hasNoCategoriesInDatabase(result) {
             }
 
             result(rowsArray["count(*)"] == 0)
+        });
+    });
+}
+
+export function checkIfRecipesWithCategoryExist(categoryId) {
+    return new Promise(resolve => {
+        db.transaction((transaction) => {
+            transaction.executeSql("SELECT count(*) FROM recipes WHERE category_id = ?;", [categoryId], (res, res2) => {
+                let rowsArray;
+
+                if (Platform.OS == "web") {
+                    rowsArray = res2.rows[0];
+                } else {
+                    rowsArray = res2.rows._array[0];
+                }
+
+                resolve(rowsArray["count(*)"] != 0)
+            });
         });
     });
 }

@@ -4,7 +4,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
 import ColorPicker from 'react-native-wheel-color-picker'
 import { Dialog } from '@rneui/themed';
-import { getAllCategories, updateCategoriesDatabase, removeCategoryFromDatabase } from '../util/DatabaseUtil'
+import { getAllCategories, updateCategoriesDatabase, removeCategoryFromDatabase, checkIfRecipesWithCategoryExist } from '../util/DatabaseUtil'
 
 let categoryToDeleteIdx = -1;
 let categoryToChangeColorIdx = -1;
@@ -15,6 +15,7 @@ function EditCategoriesScreen({ navigation }) {
   const [categories, setCategories] = useState([]);
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
   const [removeCategoryDialogVisible, setRemoveCategoryDialogVisible] = useState(false);
+  const [removeCategoryNotPossibleDialogVisible, setRemoveCategoryDialogNotPossibleVisible] = useState(false);
   const [selectedColor, setSelectedColor] = useState();
   const [nameChange, setNameChange] = useState({});
   categoriesReference = categories;
@@ -65,8 +66,15 @@ function EditCategoriesScreen({ navigation }) {
   };
 
   const handleCategoryDeletePress = (index) => {
-    categoryToDeleteIdx = index;
-    setRemoveCategoryDialogVisible(true);
+    checkIfRecipesWithCategoryExist(categories[index].category_id).then((exist) => {
+      categoryToDeleteIdx = index;
+      if (exist) {
+        setRemoveCategoryDialogNotPossibleVisible(true);
+      } else {
+        setRemoveCategoryDialogVisible(true);
+      }
+    })
+
   };
 
   const handleCategoryDelete = () => {
@@ -140,7 +148,7 @@ function EditCategoriesScreen({ navigation }) {
         <View style={{ marginBottom: 20 }}>
           <Dialog.Title title="Farbe wählen" />
         </View>
-        <View style={{height: 300}}>
+        <View style={{ height: 300 }}>
           <ColorPicker
             color={selectedColor}
             onColorChangeComplete={(color) => handleChangeColor(color)}
@@ -167,6 +175,20 @@ function EditCategoriesScreen({ navigation }) {
         <Dialog.Actions>
           <Dialog.Button title="Bestätigen" onPress={() => handleCategoryDelete()} />
           <Dialog.Button title="Abbrechen" onPress={() => setRemoveCategoryDialogVisible(false)} />
+        </Dialog.Actions>
+      </Dialog>
+
+      <Dialog
+        isVisible={removeCategoryNotPossibleDialogVisible}
+        onBackdropPress={() => setRemoveCategoryDialogNotPossibleVisible(false)}
+      >
+        <Dialog.Title title="Löschen nicht möglich!" />
+        <Text>
+          Kategorie "{categories[categoryToDeleteIdx] != undefined ? categories[categoryToDeleteIdx].name : ""}" kann nicht gelöscht werden!
+          Es gibt Rezepte, die diese Kategorie haben. Ändern Sie die Kategorie dieser Rezepte oder löschen sie diese komplett!
+        </Text>
+        <Dialog.Actions>
+          <Dialog.Button title="OK" onPress={() => setRemoveCategoryDialogNotPossibleVisible(false)} />
         </Dialog.Actions>
       </Dialog>
 
