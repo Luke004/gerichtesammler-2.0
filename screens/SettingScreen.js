@@ -2,7 +2,8 @@ import { React, useState, useEffect } from "react";
 import { StyleSheet, Text, TextInput, View, TouchableOpacity } from "react-native";
 import { Picker } from '@react-native-picker/picker';
 import { AntDesign } from '@expo/vector-icons';
-import { SORTING_OPTIONS_FRIENDLY, SORTING_OPTIONS_DB, FILTER_OPTIONS_FRIENDLY, FILTER_OPTIONS_DB } from '../util/SettingsUtil';
+import { SORTING_OPTIONS_FRIENDLY, SORTING_OPTIONS_DB } from '../util/SortUtil';
+import { FILTER_OPTIONS_DB, FILTER_OPTIONS_FRIENDLY } from '../util/FilterUtil';
 import { getSortingMethod, getFilters, setSortingCriteria, addFilter, updateFilter, removeFilter } from '../util/DatabaseUtil';
 
 import { NameFilter } from '../components/filters/NameFilter';
@@ -21,7 +22,7 @@ function Settings({ navigation }) {
 
 
   useEffect(() => {
-    setSelectedFilter(FILTER_OPTIONS_DB[0]); // TODO change with actual DB data
+    setSelectedFilter(FILTER_OPTIONS_DB[0]);
 
     getSortingMethod().then((result) => {
       setSelectedSorting(result.criteria);
@@ -50,14 +51,14 @@ function Settings({ navigation }) {
         initialValue = 3;
         break;
       case "last_cooked":
-        initialValue = "";
+        initialValue = "s 31";
         break;
       case "duration":
-        initialValue = "";
+        initialValue = "s 60";
         break;
     }
 
-    addFilter(selectedFilter, "").then((insertId) => {
+    addFilter(selectedFilter, initialValue).then((insertId) => {
       setFilters([...filters, { id: insertId, type: selectedFilter, value: initialValue }]);
     })
   };
@@ -101,11 +102,21 @@ function Settings({ navigation }) {
         );
       case "last_cooked":
         return (
-          <LastCookedFilter key={item.id} />
+          <LastCookedFilter key={item.id}
+            initialValue={item.value}
+            onValueChange={(value) => updateFilter(item.id, "last_cooked", value)}
+            onBlur={(value) => updateFilter(item.id, "last_cooked", value)}
+            onDeletePress={() => handleRemoveFilterPress(item.id)}
+          />
         );
       case "duration":
         return (
-          <DurationFilter key={item.id} />
+          <DurationFilter key={item.id}
+            initialValue={item.value}
+            onValueChange={(value) => updateFilter(item.id, "duration", value)}
+            onBlur={(value) => updateFilter(item.id, "duration", value)}
+            onDeletePress={() => handleRemoveFilterPress(item.id)}
+          />
         );
     }
   });

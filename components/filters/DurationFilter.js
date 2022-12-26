@@ -2,46 +2,49 @@ import { React, useState } from "react";
 import { StyleSheet, View, Text, TextInput } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
+import { getInitialOperator, getInitialValue, buildFilterCriteria, isValid } from '../../util/FilterUtil';
 
-const LAST_COOKED_OPTIONS = ["länger als", "kürzer als"];
+const DURATION_OPTIONS = ["länger als", "kürzer als"];
 
 export const DurationFilter = (props) => {
-  const [lastCookedFilter, setLastCookedFilter] = useState("");
-  const [lastCookedDays, setLastCookedDays] = useState("");
+  const [durationOperator, setDurationOperator] = useState(getInitialOperator(props.initialValue));
+  const [durationDays, setDurationDays] = useState(getInitialValue(props.initialValue));
 
   return (
     <View style={{ alignItems: "center", marginTop: 5 }}>
       <Text>Dauer (Minuten)</Text>
       <View style={{ width: "100%", flexDirection: "row", alignItems: "center" }}>
         <Picker
-          selectedValue={lastCookedFilter}
+          selectedValue={durationOperator}
           onValueChange={(itemValue, itemIndex) => {
-            setLastCookedFilter(itemValue);
-            //setFilterCriteria(filterEntryId, "category", itemValue);
+            setDurationOperator(itemValue);
+            if (isValid(durationDays)) {
+              props.onValueChange(buildFilterCriteria(itemValue, durationDays));
+            }
           }}
           style={styles.picker}
         >
           {
-            LAST_COOKED_OPTIONS.map((rating, index) => (
-              <Picker.Item label={rating} value={rating} key={index} />
+            DURATION_OPTIONS.map((rating, index) => (
+              <Picker.Item label={rating} value={index} key={index} />
             ))
           }
         </Picker>
         <TextInput
           style={{ width: 50, backgroundColor: "white", border: "1px solid black", fontSize: 20, marginRight: 5 }}
-          onChangeText={(value) => setLastCookedDays(value)}
+          keyboardType={"numeric"}
+          onChangeText={(value) => setDurationDays(value)}
           onBlur={() => {
-            if (lastCookedDays.replace(/\s/g, '').length) { // whitespace only check
-              //setFilterCriteria(filterEntryId, "name", lastCookedDays);
-              props.onBlur(lastCookedDays);
+            if (isValid(durationDays)) {
+              props.onBlur(buildFilterCriteria(durationOperator, durationDays));
             }
           }}
-          value={lastCookedDays}
+          value={durationDays}
         />
         <AntDesign name="delete"
           size={30}
           color="#006600"
-          onPress={() => addNewCategory()}
+          onPress={() => props.onDeletePress()}
         />
       </View>
 

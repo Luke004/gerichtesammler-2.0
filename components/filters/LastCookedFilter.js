@@ -2,38 +2,41 @@ import { React, useState } from "react";
 import { StyleSheet, View, Text, TextInput } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
+import { getInitialOperator, getInitialValue, buildFilterCriteria, isValid } from '../../util/FilterUtil';
 
 const LAST_COOKED_OPTIONS = ["länger als", "kürzer als"];
 
 export const LastCookedFilter = (props) => {
-  const [lastCookedFilter, setLastCookedFilter] = useState("");
-  const [lastCookedDays, setLastCookedDays] = useState("");
+  const [lastCookedOperator, setLastCookedOperator] = useState(getInitialOperator(props.initialValue));
+  const [lastCookedDays, setLastCookedDays] = useState(getInitialValue(props.initialValue));
 
   return (
     <View style={{ alignItems: "center", marginTop: 5 }}>
       <Text>Zuletzt zubereitet (Tage)</Text>
       <View style={{ width: "100%", flexDirection: "row", alignItems: "center" }}>
         <Picker
-          selectedValue={lastCookedFilter}
+          selectedValue={lastCookedOperator}
           onValueChange={(itemValue, itemIndex) => {
-            setLastCookedFilter(itemValue);
-            //setFilterCriteria(filterEntryId, "category", itemValue);
+            setLastCookedOperator(itemValue);
+            if (isValid(lastCookedDays)) {
+              props.onValueChange(buildFilterCriteria(itemValue, lastCookedDays));
+            }
           }}
           style={styles.picker}
         >
           {
             LAST_COOKED_OPTIONS.map((rating, index) => (
-              <Picker.Item label={rating} value={rating} key={index} />
+              <Picker.Item label={rating} value={index} key={index} />
             ))
           }
         </Picker>
         <TextInput
           style={{ width: 50, backgroundColor: "white", border: "1px solid black", fontSize: 20, marginRight: 5 }}
+          keyboardType={"numeric"}
           onChangeText={(value) => setLastCookedDays(value)}
           onBlur={() => {
-            if (lastCookedDays.replace(/\s/g, '').length) { // whitespace only check
-              //setFilterCriteria(filterEntryId, "name", lastCookedDays);
-              props.onBlur(lastCookedDays);
+            if (isValid(lastCookedDays)) {
+              props.onBlur(buildFilterCriteria(lastCookedOperator, lastCookedDays));
             }
           }}
           value={lastCookedDays}
@@ -41,7 +44,7 @@ export const LastCookedFilter = (props) => {
         <AntDesign name="delete"
           size={30}
           color="#006600"
-          onPress={() => addNewCategory()}
+          onPress={() => props.onDeletePress()}
         />
       </View>
 

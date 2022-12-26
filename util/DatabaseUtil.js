@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import { openDatabase } from 'expo-sqlite';
 import { deleteImagesFromStorage, deleteAssetsFromStorage } from './StorageUtil';
-import { FILTER_OPTIONS_DB, SORTING_OPTIONS_DB } from './SettingsUtil';
+import { SORTING_OPTIONS_DB } from './SortUtil';
 
 
 const db = openDatabase('myDb', "1.0");
@@ -64,13 +64,6 @@ export function initTables() {
                 initSortingCriteria();
             }
         });
-        /*
-        getFilterCriteria().then((res) => {
-            if (!res) {
-                initFilterCriteria();
-            }
-        });
-        */
     });
     //dropTable();
 }
@@ -163,7 +156,6 @@ export function removeFilter(filterId) {
 }
 
 export function updateFilter(id, type, criteria) {
-    console.log(criteria)
     return new Promise(resolve => {
         db.transaction((transaction) => {
             transaction.executeSql("UPDATE config_filter SET type = ?, criteria = ? WHERE filter_id = ?;", [type, criteria.toString(), id]);
