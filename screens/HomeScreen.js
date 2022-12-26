@@ -25,8 +25,7 @@ const HomeScreen = ({ navigation }) => {
       getAllRecipes(async (recipes) => {
         // cache repeated categories for less db requests
         let cachedCategories = {};
-        for (let i = 0; i < recipes.length; ++i) {
-          const recipe = recipes[i];
+        for (const recipe of recipes) {
           // get and set category color
           const categoryColor = await getCategoryColorById(recipe.category_id);
           if (!cachedCategories[recipe.category_id]) {
@@ -41,7 +40,9 @@ const HomeScreen = ({ navigation }) => {
         }
         // sort the recipes
         getSortingMethod().then((result) => {
-          recipes = sortRecipesByCriteria(recipes, result.criteria);
+          if (result) {
+            recipes = sortRecipesByCriteria(recipes, result.criteria);
+          }
           setRecipes(recipes);
         });
 

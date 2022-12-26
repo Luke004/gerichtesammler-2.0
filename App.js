@@ -19,6 +19,8 @@ export default function App() {
   useLayoutEffect(() => {
     initTables();
   }, []);
+  
+  console.log("RERENDER")
 
   return (
     <MenuProvider>

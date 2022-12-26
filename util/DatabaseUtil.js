@@ -44,7 +44,7 @@ export function initTables() {
     let tablesCreated = 0;
 
     new Promise(resolve => {
-        tables.forEach((table) => {
+        for (const table of tables) {
             db.transaction((transaction) => {
                 transaction.executeSql(table);
             },
@@ -54,10 +54,11 @@ export function initTables() {
                     console.log("table created");
                     tablesCreated++;
                     if (tablesCreated == tables.length) {
+                        console.log("all tables created");
                         resolve();
                     }
                 });
-        });
+        }
     }).then(() => {
         getSortingMethod().then((res) => {
             if (!res) {
@@ -69,7 +70,7 @@ export function initTables() {
 }
 
 function dropTable() {
-    db.transaction((transaction) => { transaction.executeSql("DROP TABLE config_sorting;") },
+    db.transaction((transaction) => { transaction.executeSql("DROP TABLE categories;") },
         (error) => console.log(error));
 }
 
@@ -93,6 +94,7 @@ export function getSortingMethod() {
         },
             (error) => {
                 console.log(error);
+                resolve();
             });
     });
 }
@@ -112,6 +114,7 @@ export function getFilters() {
         },
             (error) => {
                 console.log(error);
+                resolve([]);
             });
     });
 }
@@ -290,6 +293,7 @@ export function getAllRecipes(results) {
     },
         (error) => {
             console.log(error);
+            results([]);
         });
 }
 
