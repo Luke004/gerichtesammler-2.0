@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import { StyleSheet, Text, TextInput, View, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from "react-native";
 import { Picker } from '@react-native-picker/picker';
 import { AntDesign } from '@expo/vector-icons';
 import { SORTING_OPTIONS_FRIENDLY, SORTING_OPTIONS_DB } from '../util/SortUtil';
@@ -126,62 +126,66 @@ function Settings({ navigation }) {
 
     <View style={{ width: "100%", padding: 30 }}>
 
-      <View style={{ width: "100%", alignItems: "center" }}>
+      <ScrollView>
 
-        <TouchableOpacity
-          style={styles.editCategoriesButton}
-          onPress={() => navigation.navigate('EditCategories')}
-          underlayColor='#fff'>
-          <Text style={styles.editCategoriesButtonText}>Kategorien bearbeiten</Text>
-        </TouchableOpacity>
+        <View style={{ width: "100%", alignItems: "center" }}>
 
-        <View style={styles.separator} />
+          <TouchableOpacity
+            style={styles.editCategoriesButton}
+            onPress={() => navigation.navigate('EditCategories')}
+            underlayColor='#fff'>
+            <Text style={styles.editCategoriesButtonText}>Kategorien bearbeiten</Text>
+          </TouchableOpacity>
 
-        <Text style={styles.pickerInfoText}>Sortieren nach:</Text>
-        <Picker
-          selectedValue={selectedSorting}
-          onValueChange={(itemValue, itemIndex) => {
-            setSelectedSorting(itemValue);
-            setSortingCriteria(sortingEntryId, SORTING_OPTIONS_DB[itemIndex]);
-          }}
-          style={styles.picker}
-        >
-          {
-            SORTING_OPTIONS_FRIENDLY.map((sortingOption, index) => (
-              <Picker.Item label={sortingOption} value={SORTING_OPTIONS_DB[index]} key={index} />
-            ))
-          }
-        </Picker>
+          <View style={styles.separator} />
 
-        <View style={styles.separator} />
-
-        <Text style={styles.pickerInfoText}>Filter:</Text>
-        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+          <Text style={styles.pickerInfoText}>Sortieren nach:</Text>
           <Picker
-            selectedValue={selectedFilter}
+            selectedValue={selectedSorting}
             onValueChange={(itemValue, itemIndex) => {
-              setSelectedFilter(itemValue);
+              setSelectedSorting(itemValue);
+              setSortingCriteria(sortingEntryId, SORTING_OPTIONS_DB[itemIndex]);
             }}
-            style={[styles.picker, { marginRight: 5 }]}
+            style={styles.picker}
           >
             {
-              FILTER_OPTIONS_FRIENDLY.map((filterOption, index) => (
-                <Picker.Item label={filterOption} value={FILTER_OPTIONS_DB[index]} key={index} />
+              SORTING_OPTIONS_FRIENDLY.map((sortingOption, index) => (
+                <Picker.Item label={sortingOption} value={SORTING_OPTIONS_DB[index]} key={index} />
               ))
             }
           </Picker>
-          <AntDesign name="pluscircleo"
-            size={30}
-            color="#006600"
-            onPress={() => handleNewFilterPress()}
-          />
+
+          <View style={styles.separator} />
+
+          <Text style={styles.pickerInfoText}>Filter:</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+            <Picker
+              selectedValue={selectedFilter}
+              onValueChange={(itemValue, itemIndex) => {
+                setSelectedFilter(itemValue);
+              }}
+              style={[styles.picker, { marginRight: 5 }]}
+            >
+              {
+                FILTER_OPTIONS_FRIENDLY.map((filterOption, index) => (
+                  <Picker.Item label={filterOption} value={FILTER_OPTIONS_DB[index]} key={index} />
+                ))
+              }
+            </Picker>
+            <AntDesign name="pluscircleo"
+              size={30}
+              color="#006600"
+              onPress={() => handleNewFilterPress()}
+            />
+          </View>
+
+          {
+            myFilters
+          }
+
         </View>
 
-        {
-          myFilters
-        }
-
-      </View>
+      </ScrollView>
 
     </View>
   );
