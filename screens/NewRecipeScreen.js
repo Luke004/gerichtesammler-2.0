@@ -154,6 +154,7 @@ function NewRecipeScreen({ navigation }) {
               setSelectedCategory(itemValue)
             }
             style={{ fontSize: 18, padding: 5 }}
+            itemStyle={{ backgroundColor: "white" }}
           >
             {
               categories.map((category, index) => (
@@ -179,7 +180,7 @@ function NewRecipeScreen({ navigation }) {
           <Text style={styles.text}>
             Bilder
           </Text>
-          <View style={{ flexDirection: "row", gap: 3 }}>
+          <View style={{ flexDirection: "row", marginBottom: 5 }}>
             {
               images.length == 0 &&
               <Text style={{ paddingVertical: 5 }}>Noch keine Bilder ausgewählt!</Text>
@@ -192,8 +193,8 @@ function NewRecipeScreen({ navigation }) {
               ))
             }
           </View>
-          <View style={{ flexDirection: "row", gap: 5 }}>
-            <Feather name="paperclip" size={35} color="black" onPress={handlePickImage} />
+          <View style={{ flexDirection: "row" }}>
+            <Feather name="paperclip" size={35} color="black" style={{ marginRight: 10 }} onPress={handlePickImage} />
             <Ionicons name="camera" size={35} color="black" onPress={handleTakePhoto} />
           </View>
         </View>
@@ -244,13 +245,14 @@ function NewRecipeScreen({ navigation }) {
 const styles = StyleSheet.create({
   text: {
     fontWeight: "bold",
-    fontSize: 18,
+    fontSize: 20,
     paddingBottom: 3
   },
   textInput: {
-    fontSize: 20,
-    border: "1px solid black",
-    backgroundColor: "white"
+    backgroundColor: "white",
+    fontSize: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: "lightgrey"
   },
 });
 

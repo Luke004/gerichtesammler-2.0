@@ -10,6 +10,7 @@ import { filterRecipesByCriteria } from '../util/FilterUtil';
 
 const HomeScreen = ({ navigation }) => {
   const [recipes, setRecipes] = useState([]);
+  const [filters, setFilters] = useState([]);
   const [selectedRecipe, setSelectedRecipe] = useState();
   const [hasNoCategories, setHasNoCategories] = useState(false);
   const [removeRecipeDialogVisible, setRemoveRecipeDialogVisible] = useState(false);
@@ -35,6 +36,7 @@ const HomeScreen = ({ navigation }) => {
         }
         // filter the recipes
         const filters = await getFilters();
+        setFilters(filters);
         for (const filter of filters) {
           recipes = filterRecipesByCriteria(recipes, filter);
         }
@@ -94,6 +96,18 @@ const HomeScreen = ({ navigation }) => {
             Willkommen in der App! Sie haben noch keine Kategorien hinzugefügt. Bitte tun Sie dies rechts oben in den Einstellungen, bevor Sie neue Rezepte hinzufügen.
           </Text>
         </View>
+      }
+      {
+        !hasNoCategories && recipes?.length == 0 && filters.length == 0 &&
+        <Text style={{ fontWeight: "bold", textAlign: "center", padding: 10 }}>
+          Noch keine Rezepte vorhanden! {"\n"} Drücken Sie rechts unten auf das ( + ) um neue Rezepte hinzuzufügen!
+        </Text>
+      }
+      {
+        hasNoCategories && recipes?.length == 0 && filters.length > 0 &&
+        <Text style={{ fontWeight: "bold", textAlign: "center", padding: 10 }}>
+          Keine Rezepte unter {filters.length == 1 ? "dem" : "den"} angewandten Filter{filters.length == 1 ? "" : "n"} gefunden!
+        </Text>
       }
       <ScrollView style={{ width: '100%', flexBasis: 0 }}>
         {

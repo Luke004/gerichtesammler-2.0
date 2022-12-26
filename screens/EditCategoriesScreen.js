@@ -92,6 +92,13 @@ function EditCategoriesScreen({ navigation }) {
   return (
     <View style={{ display: "flex", flex: 1, justifyContent: "flex-start" }}>
 
+      {
+        categories?.length == 0 &&
+        <Text style={{ fontWeight: "bold", textAlign: "center", padding: 10 }}>
+          Noch keine Kategorien vorhanden! {"\n"} Drücken Sie rechts unten auf das ( + ) um neue Kategorien hinzuzufügen!
+        </Text>
+      }
+
       <ScrollView style={{ flexBasis: 0 }}>
         {
           categories.map((category, index) => (

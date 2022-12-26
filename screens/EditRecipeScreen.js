@@ -53,12 +53,11 @@ function EditRecipeScreen({ route, navigation }) {
       exif: false
     });
 
-    const newAsset = result.assets[0];
-    newAsset.isNew = true;
+    result.isNew = true;
 
-    if (!result.canceled) {
+    if (!result.cancelled) {
       setImageAssets((prevImages) => [
-        ...prevImages, newAsset
+        ...prevImages, result
       ]);
     }
   };
@@ -78,12 +77,11 @@ function EditRecipeScreen({ route, navigation }) {
       exif: false
     });
 
-    const newAsset = result.assets[0];
-    newAsset.isNew = true;
+    result.isNew = true;
 
-    if (!result.canceled) {
+    if (!result.cancelled) {
       setImageAssets((prevImages) => [
-        ...prevImages, newAsset
+        ...prevImages, result
       ]);
     }
   };
@@ -212,7 +210,7 @@ function EditRecipeScreen({ route, navigation }) {
           <Text style={styles.text}>
             Bilder
           </Text>
-          <View style={{ flexDirection: "row", gap: 3 }}>
+          <View style={{ flexDirection: "row", marginBottom: 5 }}>
             {
               imageAssets.length == 0 &&
               <Text style={{ paddingVertical: 5 }}>Noch keine Bilder ausgewählt!</Text>
@@ -225,8 +223,8 @@ function EditRecipeScreen({ route, navigation }) {
               ))
             }
           </View>
-          <View style={{ flexDirection: "row", gap: 5 }}>
-            <Feather name="paperclip" size={35} color="black" onPress={handlePickImage} />
+          <View style={{ flexDirection: "row" }}>
+            <Feather name="paperclip" size={35} color="black" style={{ marginRight: 10 }} onPress={handlePickImage} />
             <Ionicons name="camera" size={35} color="black" onPress={handleTakePhoto} />
           </View>
         </View>
@@ -277,13 +275,14 @@ function EditRecipeScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   text: {
     fontWeight: "bold",
-    fontSize: 18,
+    fontSize: 20,
     paddingBottom: 3
   },
   textInput: {
-    fontSize: 20,
-    border: "1px solid black",
-    backgroundColor: "white"
+    backgroundColor: "white",
+    fontSize: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: "lightgrey"
   },
 });
 

@@ -20,8 +20,6 @@ export default function App() {
     initTables();
   }, []);
   
-  console.log("RERENDER")
-
   return (
     <MenuProvider>
       <NavigationContainer>
