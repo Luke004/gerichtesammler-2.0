@@ -19,12 +19,6 @@ function RecipeDetailScreen({ route, navigation }) {
   const [zoomIndex, setZoomIndex] = useState(0);
   const [imageZoomViewVisible, setImageZoomViewVisible] = useState(false);
 
-  // below is a workaround fix for WebView which permission settings do not work accordingly
-  const [webViewRenderedOnce, setWebViewRenderedOnce] = useState(false);
-  const onLoadWebView = () => {
-    setWebViewRenderedOnce(true);
-  };
-
   const recipe = route.params.recipe;
 
   let paperBackground;
@@ -118,8 +112,7 @@ function RecipeDetailScreen({ route, navigation }) {
                 }}>
                   <WebView
                     allowFileAccess={true}
-                    onLoad={onLoadWebView}
-                    source={webViewRenderedOnce ? { uri: imageAssets[zoomIndex].uri } : undefined}
+                    source={{ uri: imageAssets[zoomIndex].uri }}
                     style={{
                       height: Math.round(Dimensions.get("window").height),
                       width: Math.round(Dimensions.get("window").width),
@@ -137,13 +130,5 @@ function RecipeDetailScreen({ route, navigation }) {
     </View>
   );
 };
-
-/*
-RecipeDetail.navigationOptions = (navData) => {
-  return {
-    headerTitle: navData.navigation.getParam("username"),
-  };
-};
-*/
 
 export default RecipeDetailScreen;
