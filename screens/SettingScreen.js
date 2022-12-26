@@ -124,11 +124,11 @@ function Settings({ navigation }) {
 
   return (
 
-    <View style={{ width: "100%", padding: 30 }}>
+    <View style={{ width: "100%" }}>
 
       <ScrollView>
 
-        <View style={{ width: "100%", alignItems: "center" }}>
+        <View style={{ width: "100%", alignItems: "center", padding: 30 }}>
 
           <TouchableOpacity
             style={styles.editCategoriesButton}
