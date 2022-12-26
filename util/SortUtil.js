@@ -7,6 +7,7 @@ export function sortRecipesByCriteria(recipes, criteria) {
         case "name":
             return recipes.sort(compareByName);
         case "category":
+            return recipes.sort(compareByCategory);
         case "rating":
             return recipes.sort(compareByRating);
         case "last_cooked":
