@@ -11,6 +11,8 @@ const PAPER_BACKGROUND = require('../assets/backgrounds/old-paper.jpg');
 const PAPER_BACKGROUND_SMALL = require('../assets/backgrounds/old-paper-small.jpg');
 const PAPER_BACKGROUND_LARGE = require('../assets/backgrounds/old-paper-large.jpg');
 
+const IMAGE_HORIZONTAL_MARGIN = 40;
+const IMAGE_WIDTH = Math.round(Dimensions.get("window").width) - IMAGE_HORIZONTAL_MARGIN;
 
 function RecipeDetailScreen({ route, navigation }) {
   const [imageAssets, setImageAssets] = useState([]);
@@ -88,8 +90,14 @@ function RecipeDetailScreen({ route, navigation }) {
 
             {
               imageAssets.map((imageAsset, index) => (
-                <TouchableHighlight key={index} onPress={() => handleImagePress(index)}>
-                  <Image source={{ uri: imageAsset.uri }} style={{ width: "100%", maxHeight: 400, aspectRatio: 1, marginBottom: 10 }} />
+                <TouchableHighlight style={{ width: "100%" }} key={index} onPress={() => handleImagePress(index)}>
+                  <Image source={{ uri: imageAsset.uri }}
+                    style={{
+                      width: IMAGE_WIDTH,
+                      height: IMAGE_WIDTH / imageAsset.width * imageAsset.height,
+                      resizeMode: "contain",
+                      marginBottom: 10
+                    }} />
                 </TouchableHighlight>
               ))
             }
