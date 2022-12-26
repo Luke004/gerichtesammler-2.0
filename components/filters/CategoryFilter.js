@@ -7,7 +7,7 @@ import { getAllCategories } from '../../util/DatabaseUtil';
 
 export const CategoryFilter = (props) => {
   const [categories, setCategories] = useState();
-  const [categoryFilter, setCategoryFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState(props.initialValue);
 
   useEffect(() => {
     getAllCategories((results) => {
@@ -23,7 +23,7 @@ export const CategoryFilter = (props) => {
           selectedValue={categoryFilter}
           onValueChange={(itemValue, itemIndex) => {
             setCategoryFilter(itemValue);
-            //setFilterCriteria(filterEntryId, "category", itemValue);
+            props.onValueChange(itemValue);
           }}
           style={styles.picker}
         >
@@ -37,7 +37,7 @@ export const CategoryFilter = (props) => {
         <AntDesign name="delete"
           size={30}
           color="#006600"
-          onPress={() => addNewCategory()}
+          onPress={() => props.onDeletePress()}
         />
       </View>
 

@@ -6,7 +6,7 @@ import { Picker } from '@react-native-picker/picker';
 const RATING_OPTIONS = ["1 Stern", "2 Sterne", "3 Sterne", "4 Sterne", "5 Sterne"];
 
 export const RatingFilter = (props) => {
-  const [ratingFilter, setRatingFilter] = useState("");
+  const [ratingFilter, setRatingFilter] = useState(props.initialValue);
 
   return (
     <View style={{ alignItems: "center", marginTop: 5 }}>
@@ -16,20 +16,20 @@ export const RatingFilter = (props) => {
           selectedValue={ratingFilter}
           onValueChange={(itemValue, itemIndex) => {
             setRatingFilter(itemValue);
-            //setFilterCriteria(filterEntryId, "category", itemValue);
+            props.onValueChange(itemValue);
           }}
           style={styles.picker}
         >
           {
             RATING_OPTIONS.map((rating, index) => (
-              <Picker.Item label={rating} value={rating} key={index} />
+              <Picker.Item label={rating} value={index + 1} key={index} />
             ))
           }
         </Picker>
         <AntDesign name="delete"
           size={30}
           color="#006600"
-          onPress={() => addNewCategory()}
+          onPress={() => props.onDeletePress()}
         />
       </View>
 

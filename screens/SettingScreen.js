@@ -3,7 +3,7 @@ import { StyleSheet, Text, TextInput, View, TouchableOpacity } from "react-nativ
 import { Picker } from '@react-native-picker/picker';
 import { AntDesign } from '@expo/vector-icons';
 import { SORTING_OPTIONS_FRIENDLY, SORTING_OPTIONS_DB, FILTER_OPTIONS_FRIENDLY, FILTER_OPTIONS_DB } from '../util/SettingsUtil';
-import { getSortingCriteria, setSortingCriteria, getFilterCriteria, setFilterCriteria, getAllCategories } from '../util/DatabaseUtil';
+import { getSortingMethod, getFilters, setSortingCriteria, addFilter, updateFilter, removeFilter } from '../util/DatabaseUtil';
 
 import { NameFilter } from '../components/filters/NameFilter';
 import { CategoryFilter } from '../components/filters/CategoryFilter';
@@ -12,60 +12,102 @@ import { LastCookedFilter } from '../components/filters/LastCookedFilter';
 import { DurationFilter } from '../components/filters/DurationFilter';
 
 let sortingEntryId;
-let filterEntryId;
 
 function Settings({ navigation }) {
   const [selectedSorting, setSelectedSorting] = useState();
   const [selectedFilter, setSelectedFilter] = useState(0);
 
-  const [nameFilterIds, setNameFilterIds] = useState([]);
-
+  const [filters, setFilters] = useState([]);
 
 
   useEffect(() => {
     setSelectedFilter(FILTER_OPTIONS_DB[0]); // TODO change with actual DB data
-    /*
 
-    getSortingCriteria().then((result) => {
+    getSortingMethod().then((result) => {
       setSelectedSorting(result.criteria);
       sortingEntryId = result.id;
     });
 
-    getFilterCriteria().then((filter) => {
-      setSelectedFilter(filter.type);
-      filterEntryId = filter.id;
-
-      switch (filter.type) {
-        case "name":
-          setNameFilter(filter.criteria);
-          break;
-        case "category":
-          setCategoryFilter(Number(filter.criteria));
-          break;
+    getFilters().then((filters) => {
+      if (!filters) return;
+      const myFilters = [];
+      for (const filter of filters) {
+        myFilters.push({ id: filter.filter_id, type: filter.type, value: filter.criteria });
       }
-
+      setFilters(myFilters);
     });
-    */
 
   }, []);
 
 
-  const addNewFilter = () => {
+  const handleNewFilterPress = () => {
+    let initialValue;
     switch (selectedFilter) {
       case "name":
-        setNameFilterIds([...nameFilterIds, nameFilterIds.length]);
+        initialValue = "";
         break;
-      case "category":
       case "rating":
+        initialValue = 3;
+        break;
       case "last_cooked":
+        initialValue = "";
+        break;
       case "duration":
+        initialValue = "";
+        break;
     }
+
+    addFilter(selectedFilter, "").then((insertId) => {
+      setFilters([...filters, { id: insertId, type: selectedFilter, value: initialValue }]);
+    })
   };
 
-  let myNameFilterArray = nameFilterIds.map((item, key) => {
-    return (
-      <NameFilter key={item} onBlur={(a) => console.log(item)} ></NameFilter>
-    );
+  const handleRemoveFilterPress = (filterId) => {
+    removeFilter(filterId).then(() => {
+      console.log(filters)
+      setFilters(
+        filters.filter(f =>
+          f.id !== filterId
+        )
+      );
+    })
+  };
+
+  let myFilters = filters.map((item, key) => {
+    switch (item.type) {
+      case "name":
+        return (
+          <NameFilter key={item.id}
+            initialValue={item.value}
+            onBlur={(value) => updateFilter(item.id, "name", value)}
+            onDeletePress={() => handleRemoveFilterPress(item.id)}
+          />
+        );
+      case "category":
+        return (
+          <CategoryFilter key={item.id}
+            initialValue={item.value}
+            onValueChange={(value) => updateFilter(item.id, "category", value)}
+            onDeletePress={() => handleRemoveFilterPress(item.id)}
+          />
+        );
+      case "rating":
+        return (
+          <RatingFilter key={item.id}
+            initialValue={item.value}
+            onValueChange={(value) => updateFilter(item.id, "rating", value)}
+            onDeletePress={() => handleRemoveFilterPress(item.id)}
+          />
+        );
+      case "last_cooked":
+        return (
+          <LastCookedFilter key={item.id} />
+        );
+      case "duration":
+        return (
+          <DurationFilter key={item.id} />
+        );
+    }
   });
 
 
@@ -120,18 +162,13 @@ function Settings({ navigation }) {
           <AntDesign name="pluscircleo"
             size={30}
             color="#006600"
-            onPress={() => addNewFilter()}
+            onPress={() => handleNewFilterPress()}
           />
         </View>
 
         {
-          myNameFilterArray
+          myFilters
         }
-
-        <CategoryFilter></CategoryFilter>
-        <RatingFilter></RatingFilter>
-        <LastCookedFilter></LastCookedFilter>
-        <DurationFilter></DurationFilter>
 
       </View>
 

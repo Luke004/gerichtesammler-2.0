@@ -72,14 +72,16 @@ function compareByDuration(a, b) {
     return 0;
 }
 
-export function filterRecipesByCriteria(recipes, filterCriteria) {
-    if (filterCriteria.type === "none") return recipes;
+export function filterRecipesByCriteria(recipes, filter) {
+    if (filter.type === "none") return recipes;
 
-    switch (filterCriteria.type) {
+    switch (filter.type) {
         case "name":
-            return recipes.filter(recipe => recipe.name.toLowerCase().includes(filterCriteria.criteria.toLowerCase()));
+            return recipes.filter(recipe => recipe.name.toLowerCase().includes(filter.criteria.toLowerCase()));
         case "category":
-            return recipes.filter(recipe => recipe.category_id == filterCriteria.criteria);
+            return recipes.filter(recipe => recipe.category_id == filter.criteria);
+        case "rating":
+            return recipes.filter(recipe => recipe.rating == filter.criteria);
     }
 
     return recipes;

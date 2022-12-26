@@ -23,7 +23,7 @@ export default function App() {
   return (
     <MenuProvider>
       <NavigationContainer>
-        <Stack.Navigator headerTitleStyle="font-weight: bold" initialRouteName="Settings">
+        <Stack.Navigator headerTitleStyle="font-weight: bold" initialRouteName="Home">
           <Stack.Screen
             name="Home"
             component={HomeScreen}

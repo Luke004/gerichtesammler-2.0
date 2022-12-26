@@ -59,7 +59,7 @@ export function initTables() {
                 });
         });
     }).then(() => {
-        getSortingCriteria().then((res) => {
+        getSortingMethod().then((res) => {
             if (!res) {
                 initSortingCriteria();
             }
@@ -85,14 +85,7 @@ function initSortingCriteria() {
         (error) => console.log(error));
 }
 
-/*
-function initFilterCriteria() {
-    db.transaction((transaction) => { transaction.executeSql("INSERT INTO config_filter (type) VALUES(?);", FILTER_OPTIONS_DB[0]) },
-        (error) => console.log(error));
-}
-*/
-
-export function getSortingCriteria() {
+export function getSortingMethod() {
     return new Promise(resolve => {
         db.readTransaction((transaction) => {
             transaction.executeSql("SELECT * FROM config_sorting", undefined, (res, res2) => {
@@ -143,10 +136,37 @@ export function setSortingCriteria(id, criteria) {
     });
 }
 
-export function setFilterCriteria(id, type, criteria) {
+export function addFilter(type, criteria) {
     return new Promise(resolve => {
         db.transaction((transaction) => {
-            transaction.executeSql("UPDATE config_filter SET type = ?, criteria = ? WHERE filter_id = ?;", [type, criteria ? criteria.toString() : undefined, id]);
+            transaction.executeSql("INSERT INTO config_filter (type, criteria) VALUES(?, ?);", [type, criteria], (res, res2) => {
+                resolve(res2.insertId);
+            },);
+        },
+            (error) => {
+                console.log(error);
+            });
+    });
+}
+
+export function removeFilter(filterId) {
+    return new Promise(resolve => {
+        db.transaction((transaction) => {
+            transaction.executeSql("DELETE FROM config_filter WHERE filter_id = ?;", [filterId]);
+        },
+            (error) => {
+                console.log(error);
+            }, () => {
+                resolve();
+            });
+    });
+}
+
+export function updateFilter(id, type, criteria) {
+    console.log(criteria)
+    return new Promise(resolve => {
+        db.transaction((transaction) => {
+            transaction.executeSql("UPDATE config_filter SET type = ?, criteria = ? WHERE filter_id = ?;", [type, criteria.toString(), id]);
         },
             (error) => {
                 console.log(error);

@@ -4,7 +4,7 @@ import { AntDesign } from '@expo/vector-icons';
 
 
 export const NameFilter = (props) => {
-  const [nameFilter, setNameFilter] = useState("");
+  const [nameFilter, setNameFilter] = useState(props.initialValue);
 
   return (
     <View style={{ alignItems: "center", marginTop: 5 }}>
@@ -15,7 +15,6 @@ export const NameFilter = (props) => {
           onChangeText={(value) => setNameFilter(value)}
           onBlur={() => {
             if (nameFilter.replace(/\s/g, '').length) { // whitespace only check
-              //setFilterCriteria(filterEntryId, "name", nameFilter);
               props.onBlur(nameFilter);
             }
           }}
@@ -24,7 +23,7 @@ export const NameFilter = (props) => {
         <AntDesign name="delete"
           size={30}
           color="#006600"
-          onPress={() => addNewCategory()}
+          onPress={() => props.onDeletePress()}
         />
       </View>
 
