@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import { Text, View, ScrollView, TextInput, Button, Image, StyleSheet, TouchableOpacity, Platform } from "react-native";
+import { Text, View, ScrollView, TextInput, Button, Image, StyleSheet, TouchableOpacity, Platform, Dimensions } from "react-native";
 import { Dialog } from '@rneui/themed';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
@@ -22,7 +22,7 @@ function EditRecipeScreen({ route, navigation }) {
   // text input states
   const [recipeName, setRecipeName] = useState(recipe.name);
   const [recipeInstructions, setRecipeInstructions] = useState(recipe.instructions);
-  const [recipeDuration, setRecipeDuration] = useState(recipe.duration);
+  const [recipeDuration, setRecipeDuration] = useState(recipe.duration.toString());
   const [recipeRating, setRecipeRating] = useState(recipe.rating);
 
 
@@ -166,10 +166,9 @@ function EditRecipeScreen({ route, navigation }) {
             Beschreibung
           </Text>
           <TextInput
-            editable
-            multiline
+            multiline={true}
             numberOfLines={3}
-            style={styles.textInput}
+            style={[styles.textInput, {maxHeight: Math.round(Dimensions.get("window").height / 3)} ]}
             onChangeText={(value) => setRecipeInstructions(value)}
             value={recipeInstructions}
           />

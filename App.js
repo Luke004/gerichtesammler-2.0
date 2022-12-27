@@ -1,4 +1,5 @@
 import { React, useLayoutEffect } from "react";
+import { StatusBar } from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from "@react-navigation/stack";
 import { Feather, Ionicons } from "@expo/vector-icons";
@@ -19,9 +20,13 @@ export default function App() {
   useLayoutEffect(() => {
     initTables();
   }, []);
-  
+
   return (
     <MenuProvider>
+      <StatusBar
+        barStyle={"dark-content"}
+        backgroundColor="lightgrey"
+      />
       <NavigationContainer>
         <Stack.Navigator headerTitleStyle="font-weight: bold" initialRouteName="Home">
           <Stack.Screen

@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import { Text, View, ScrollView, TextInput, Button, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, View, ScrollView, TextInput, Button, Image, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import { Dialog } from '@rneui/themed';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
@@ -9,8 +9,6 @@ import { AirbnbRating } from '@rneui/themed';
 import * as ImagePicker from 'expo-image-picker';
 import { createNewRecipe, getAllCategories, addImageToDatabase } from '../util/DatabaseUtil';
 
-
-//const categories = ["Fleisch", "Vegetarisch", "Suppe"];
 const recipeRatingDefault = 2;
 
 function NewRecipeScreen({ navigation }) {
@@ -22,7 +20,7 @@ function NewRecipeScreen({ navigation }) {
   // text input states
   const [recipeName, setRecipeName] = useState("");
   const [recipeInstructions, setRecipeInstructions] = useState("");
-  const [recipeDuration, setRecipeDuration] = useState(0);
+  const [recipeDuration, setRecipeDuration] = useState("0");
   const [recipeRating, setRecipeRating] = useState(recipeRatingDefault);
 
   useEffect(() => {
@@ -42,11 +40,9 @@ function NewRecipeScreen({ navigation }) {
       exif: false
     });
 
-    console.log(result);
-
-    if (!result.canceled) {
+    if (!result.cancelled) {
       setImages((prevImages) => [
-        ...prevImages, ...result.assets
+        ...prevImages, result
       ]);
     }
   };
@@ -66,11 +62,9 @@ function NewRecipeScreen({ navigation }) {
       exif: false
     });
 
-    console.log(result);
-
-    if (!result.canceled) {
+    if (!result.cancelled) {
       setImages((prevImages) => [
-        ...prevImages, ...result.assets
+        ...prevImages, result
       ]);
     }
   };
@@ -135,10 +129,9 @@ function NewRecipeScreen({ navigation }) {
             Beschreibung
           </Text>
           <TextInput
-            editable
-            multiline
+            multiline={true}
             numberOfLines={3}
-            style={styles.textInput}
+            style={[styles.textInput, { maxHeight: Math.round(Dimensions.get("window").height / 3) }]}
             onChangeText={(value) => setRecipeInstructions(value)}
             value={recipeInstructions}
           />
