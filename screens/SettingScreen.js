@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Platform } from "react-native";
 import { Picker } from '@react-native-picker/picker';
 import { AntDesign } from '@expo/vector-icons';
 import { SORTING_OPTIONS_FRIENDLY, SORTING_OPTIONS_DB } from '../util/SortUtil';
@@ -65,7 +65,6 @@ function Settings({ navigation }) {
 
   const handleRemoveFilterPress = (filterId) => {
     removeFilter(filterId).then(() => {
-      console.log(filters)
       setFilters(
         filters.filter(f =>
           f.id !== filterId
@@ -258,7 +257,8 @@ const styles = StyleSheet.create({
   picker: {
     width: 230,
     fontSize: 18,
-    padding: 5
+    padding: 5,
+    backgroundColor: Platform.OS != "ios" ? "white" : ""
   },
   pickerInfoText: {
     fontWeight: "bold",

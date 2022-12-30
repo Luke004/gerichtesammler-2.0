@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import { Text, View, ScrollView, TextInput, Button, Image, StyleSheet, TouchableOpacity, Platform, Dimensions } from "react-native";
+import { Text, View, ScrollView, TextInput, Image, StyleSheet, TouchableOpacity, Platform, Dimensions } from "react-native";
 import { Dialog } from '@rneui/themed';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
@@ -184,7 +184,7 @@ function EditRecipeScreen({ route, navigation }) {
             onValueChange={(itemValue, itemIndex) =>
               setSelectedCategory(itemValue)
             }
-            style={{ fontSize: 18, padding: 5 }}
+            style={{ fontSize: 18, padding: 5, backgroundColor: "white" }}
             itemStyle={{ height: 140 }}
           >
             {

@@ -1,6 +1,6 @@
 import { React, useState, useEffect } from "react";
 import { Text, View, ScrollView, Image, ImageBackground, TouchableHighlight, Dimensions, Platform } from "react-native";
-import ImageView from "react-native-image-viewing";
+//import ImageView from "react-native-image-viewing";
 import { Card } from '@rneui/themed';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { convertToReadableDurationInfo, convertToReadableLastCookedInfo } from "../util/RecipeUtil";
@@ -97,26 +97,6 @@ function RecipeDetailScreen({ route, navigation }) {
               ))
             }
 
-            {imageAssets.length > 0 &&
-              <ImageView
-                images={imageAssets}
-                imageIndex={imageIndex}
-                visible={visible}
-                onRequestClose={() => setIsVisible(false)}
-                FooterComponent={(imageIndex) => (
-                  <View style={{
-                    height: 64,
-                    alignItems: "center",
-                    justifyContent: "center"
-                  }}>
-                    <Text style={{
-                      fontSize: 17,
-                      color: "white"
-                    }}>{imageIndex.imageIndex + 1} / {imageAssets.length}</Text>
-                  </View>
-                )}
-              />
-            }
 
           </View>
         </Card>

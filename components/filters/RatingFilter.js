@@ -1,5 +1,5 @@
 import { React, useState } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, Platform } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 
@@ -14,7 +14,7 @@ export const RatingFilter = (props) => {
       <View style={{ width: "100%", flexDirection: "row", alignItems: "center" }}>
         <Picker
           selectedValue={ratingFilter}
-          onValueChange={(itemValue, itemIndex) => {
+          onValueChange={(itemValue) => {
             setRatingFilter(itemValue);
             props.onValueChange(itemValue);
           }}
@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
   picker: {
     width: 230,
     fontSize: 18,
+    backgroundColor: Platform.OS != "ios" ? "white" : "",
     padding: 5,
     marginTop: 2,
     marginRight: 5

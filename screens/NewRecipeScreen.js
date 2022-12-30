@@ -147,7 +147,7 @@ function NewRecipeScreen({ navigation }) {
             onValueChange={(itemValue, itemIndex) =>
               setSelectedCategory(itemValue)
             }
-            style={{ fontSize: 18, padding: 5 }}
+            style={{ fontSize: 18, padding: 5, backgroundColor: "white" }}
             itemStyle={{ height: 140 }}
           >
             {

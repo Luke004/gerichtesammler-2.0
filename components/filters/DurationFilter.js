@@ -1,5 +1,5 @@
 import { React, useState } from "react";
-import { StyleSheet, View, Text, TextInput } from "react-native";
+import { StyleSheet, View, Text, TextInput, Platform } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { getInitialOperator, getInitialValue, buildFilterCriteria, isValid } from '../../util/FilterUtil';
@@ -57,6 +57,7 @@ const styles = StyleSheet.create({
   picker: {
     width: 175,
     fontSize: 18,
+    backgroundColor: Platform.OS != "ios" ? "white" : "",
     padding: 5,
     marginTop: 2,
     marginRight: 5
