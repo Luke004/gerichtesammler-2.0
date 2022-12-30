@@ -1,6 +1,6 @@
 import { React, useState, useEffect } from "react";
-import { Text, View, ScrollView, Image, ImageBackground, TouchableHighlight, Modal, Dimensions, Platform } from "react-native";
-import { WebView } from "react-native-webview";
+import { Text, View, ScrollView, Image, ImageBackground, TouchableHighlight, Dimensions, Platform } from "react-native";
+import ImageView from "react-native-image-viewing";
 import { Card } from '@rneui/themed';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { convertToReadableDurationInfo, convertToReadableLastCookedInfo } from "../util/RecipeUtil";
@@ -16,8 +16,8 @@ const IMAGE_WIDTH = Math.round(Dimensions.get("window").width) - IMAGE_HORIZONTA
 
 function RecipeDetailScreen({ route, navigation }) {
   const [imageAssets, setImageAssets] = useState([]);
-  const [zoomIndex, setZoomIndex] = useState(0);
-  const [imageZoomViewVisible, setImageZoomViewVisible] = useState(false);
+  const [imageIndex, setImageIndex] = useState(0);
+  const [visible, setIsVisible] = useState(false);
 
   const recipe = route.params.recipe;
 
@@ -42,18 +42,19 @@ function RecipeDetailScreen({ route, navigation }) {
   }
 
   const handleImagePress = (index) => {
-    setZoomIndex(index);
-    setImageZoomViewVisible(true);
+    setImageIndex(index);
+    setIsVisible(true);
   }
 
   return (
-    <View style={{ flex: 1, height: 800 }}>
-      <ScrollView>
+    <View style={{ flex: 1 }}>
+      <ScrollView scrollIndicatorInsets={{ right: 1 }}>
         <Card containerStyle={{ margin: 0 }}>
-          <ImageBackground source={require('../assets/backgrounds/pencil-draw.png')} resizeMode="stretch"
+          <ImageBackground
+            source={require('../assets/backgrounds/pencil-draw.png')}
+            resizeMode="stretch"
             imageStyle={{ tintColor: recipe.categoryColor, opacity: 0.3, position: "absolute", top: -15 }}>
             <Card.Title style={{ fontSize: 20 }} >{recipe.name}</Card.Title>
-
           </ImageBackground>
           <Card.Divider style={{ paddingTop: 10, width: "50%", alignSelf: "center" }} />
           <View style={{ alignItems: "center" }}>
@@ -97,30 +98,24 @@ function RecipeDetailScreen({ route, navigation }) {
             }
 
             {imageAssets.length > 0 &&
-              <Modal
-                animationType={"fade"}
-                transparent={false}
-                visible={imageZoomViewVisible}
-                onRequestClose={() => {
-                  setImageZoomViewVisible(false);
-                }}
-              >
-                <View style={{
-                  flex: 1,
-                  alignItems: "center",
-                  justifyContent: "space-between"
-                }}>
-                  <WebView
-                    allowFileAccess={true}
-                    source={{ uri: imageAssets[zoomIndex].uri }}
-                    style={{
-                      height: Math.round(Dimensions.get("window").height),
-                      width: Math.round(Dimensions.get("window").width),
-                      flex: 1
-                    }}
-                  />
-                </View>
-              </Modal>
+              <ImageView
+                images={imageAssets}
+                imageIndex={imageIndex}
+                visible={visible}
+                onRequestClose={() => setIsVisible(false)}
+                FooterComponent={(imageIndex) => (
+                  <View style={{
+                    height: 64,
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}>
+                    <Text style={{
+                      fontSize: 17,
+                      color: "white"
+                    }}>{imageIndex.imageIndex + 1} / {imageAssets.length}</Text>
+                  </View>
+                )}
+              />
             }
 
           </View>

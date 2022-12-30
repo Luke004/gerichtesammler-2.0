@@ -48,7 +48,7 @@ function EditRecipeScreen({ route, navigation }) {
     // No permissions request is necessary for launching the imageAsset library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
+      allowsEditing: Platform.OS == 'ios' ? false : true,
       quality: 0.5,
       exif: false
     });
@@ -72,7 +72,7 @@ function EditRecipeScreen({ route, navigation }) {
 
     let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
+      allowsEditing: Platform.OS == 'ios' ? false : true,
       quality: 0.5,
       exif: false
     });
@@ -147,8 +147,9 @@ function EditRecipeScreen({ route, navigation }) {
   };
 
   return (
-    <View style={{ justifyContent: "flex-start", padding: 10, gap: 10 }}>
-      <ScrollView>
+    <View style={{ flex: 1, paddingHorizontal: 10 }}>
+
+      <ScrollView scrollIndicatorInsets={{ right: 1 }}>
 
         <View>
           <Text style={styles.text}>
@@ -168,7 +169,7 @@ function EditRecipeScreen({ route, navigation }) {
           <TextInput
             multiline={true}
             numberOfLines={3}
-            style={[styles.textInput, {maxHeight: Math.round(Dimensions.get("window").height / 3)} ]}
+            style={[styles.textInput, { maxHeight: Math.round(Dimensions.get("window").height / 3) }]}
             onChangeText={(value) => setRecipeInstructions(value)}
             value={recipeInstructions}
           />
@@ -184,6 +185,7 @@ function EditRecipeScreen({ route, navigation }) {
               setSelectedCategory(itemValue)
             }
             style={{ fontSize: 18, padding: 5 }}
+            itemStyle={{ height: 140 }}
           >
             {
               categories.map((category, index) => (
@@ -249,10 +251,12 @@ function EditRecipeScreen({ route, navigation }) {
           />
         </View>
 
-        <Button
-          title="Speichern"
+        <TouchableOpacity
+          style={styles.saveButton}
           onPress={() => handleSaveRecipe()}
-        />
+          underlayColor='#fff'>
+          <Text style={styles.saveButtonText}>Speichern</Text>
+        </TouchableOpacity>
 
         <Dialog
           isVisible={confirmDeleteImageDialogVisible}
@@ -273,6 +277,7 @@ function EditRecipeScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   text: {
+    marginTop: 10,
     fontWeight: "bold",
     fontSize: 20,
     paddingBottom: 3
@@ -282,6 +287,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     borderBottomWidth: 1,
     borderBottomColor: "lightgrey"
+  },
+  saveButton: {
+    margin: 10,
+    backgroundColor: '#1E6738',
+    padding: 10
+  },
+  saveButtonText: {
+    fontSize: 20,
+    color: '#fff',
+    textAlign: 'center',
   },
 });
 

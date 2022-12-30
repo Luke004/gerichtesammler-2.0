@@ -10,12 +10,23 @@ export const saveImagesToStorage = async (images) => {
     }
 
     // save images to storage
+    let album = await MediaLibrary.getAlbumAsync("gerichtesammler");
+
     const imgData = [];
-    for (let i = 0; i < images.length; ++i) {
-        const asset = await MediaLibrary.createAssetAsync(images[i].uri);
+    const assetIds = [];
+    for (const image of images) {
+        const asset = await MediaLibrary.createAssetAsync(image.uri);
         imgData.push({ filename: asset.filename, created: asset.creationTime });
-        MediaLibrary.createAlbumAsync(IMAGES_ALBUM_NAME, asset, false);
+        if (!album) {
+            console.log("Album 'gerichtesammler' doesn't exist! Creating ...");
+            // first asset is added with creation of album
+            album = await MediaLibrary.createAlbumAsync(IMAGES_ALBUM_NAME, asset, false);
+        } else {
+            assetIds.push(asset.id);
+        }
     }
+    // add the rest of the assets
+    await MediaLibrary.addAssetsToAlbumAsync(assetIds, album, false);
 
     return imgData;
 };
@@ -40,11 +51,13 @@ export const deleteImagesFromStorage = async (images) => {
 
     const assets = await findAssetsForImageData(images);
     const assetsIdsToDelete = assets.map(asset => asset.id);
-    
+
     MediaLibrary.deleteAssetsAsync(assetsIdsToDelete).then((result) => {
         if (result) {
             console.log("Assets " + assetsIdsToDelete + " successfully deleted.")
         }
+    }).catch(() => {
+        console.log("User declined deleting recipe picture.")
     });
 };
 
@@ -77,7 +90,6 @@ async function findAssetsForImageData(imgData) {
     const earliestCreationTime = Math.min(...imgData.map(img => img.created));
     const album = await MediaLibrary.getAlbumAsync("gerichtesammler");
     const assetData = await MediaLibrary.getAssetsAsync({ album: album.id, createdAfter: earliestCreationTime - 1 });
-
     let assets = assetData.assets;
     let imgsNotFound = [];
 

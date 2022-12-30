@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import { StyleSheet, View, Text, TextInput } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { getAllCategories } from '../../util/DatabaseUtil';
@@ -26,11 +26,12 @@ export const CategoryFilter = (props) => {
             props.onValueChange(itemValue);
           }}
           style={styles.picker}
+          itemStyle={{ height: 120 }}
         >
           {
             categories &&
             categories.map((category, index) => (
-              <Picker.Item label={category.name} value={category.category_id} key={index} />
+              <Picker.Item label={category.name} value={category.category_id} key={index} color={category.color} />
             ))
           }
         </Picker>
@@ -48,7 +49,6 @@ export const CategoryFilter = (props) => {
 const styles = StyleSheet.create({
   picker: {
     width: 230,
-    backgroundColor: "white",
     fontSize: 18,
     padding: 5,
     marginTop: 2,

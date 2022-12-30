@@ -23,6 +23,7 @@ export const LastCookedFilter = (props) => {
             }
           }}
           style={styles.picker}
+          itemStyle={{ height: 120 }}
         >
           {
             LAST_COOKED_OPTIONS.map((rating, index) => (
@@ -31,7 +32,7 @@ export const LastCookedFilter = (props) => {
           }
         </Picker>
         <TextInput
-          style={{ width: 50, backgroundColor: "white", border: "1px solid black", fontSize: 20, marginRight: 5 }}
+          style={{ width: 50, backgroundColor: "white", borderBottomWidth: 1, borderBottomColor: "lightgrey", fontSize: 20, marginRight: 5 }}
           keyboardType={"numeric"}
           onChangeText={(value) => setLastCookedDays(value)}
           onBlur={() => {
@@ -55,7 +56,6 @@ export const LastCookedFilter = (props) => {
 const styles = StyleSheet.create({
   picker: {
     width: 175,
-    backgroundColor: "white",
     fontSize: 18,
     padding: 5,
     marginTop: 2,

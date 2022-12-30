@@ -98,7 +98,7 @@ function EditCategoriesScreen({ navigation }) {
   };
 
   return (
-    <View style={{ display: "flex", flex: 1, justifyContent: "flex-start" }}>
+    <View style={{ flex: 1 }}>
 
       {
         categories?.length == 0 &&
@@ -107,7 +107,7 @@ function EditCategoriesScreen({ navigation }) {
         </Text>
       }
 
-      <ScrollView style={{ flexBasis: 0 }}>
+      <ScrollView style={{ flexBasis: 0 }} scrollIndicatorInsets={{ right: 1 }}>
         {
           categories.map((category, index) => (
             <View key={index} style={{ display: "flex", flexDirection: "row", justifyContent: "flex-start", marginBottom: 1 }}>

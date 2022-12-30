@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import { Text, View, ScrollView, TextInput, Button, Image, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
+import { Text, View, ScrollView, TextInput, Image, StyleSheet, TouchableOpacity, Dimensions, Platform } from "react-native";
 import { Dialog } from '@rneui/themed';
 import { Ionicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
@@ -35,7 +35,7 @@ function NewRecipeScreen({ navigation }) {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
+      allowsEditing: Platform.OS == 'ios' ? false : true,
       quality: 0.5,
       exif: false
     });
@@ -57,7 +57,7 @@ function NewRecipeScreen({ navigation }) {
 
     let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
+      allowsEditing: Platform.OS == 'ios' ? false : true,
       quality: 0.5,
       exif: false
     });
@@ -110,8 +110,9 @@ function NewRecipeScreen({ navigation }) {
   };
 
   return (
-    <View style={{ justifyContent: "flex-start", padding: 10, gap: 10 }}>
-      <ScrollView>
+    <View style={{ flex: 1, paddingHorizontal: 10 }}>
+
+      <ScrollView scrollIndicatorInsets={{ right: 1 }}>
 
         <View>
           <Text style={styles.text}>
@@ -147,7 +148,7 @@ function NewRecipeScreen({ navigation }) {
               setSelectedCategory(itemValue)
             }
             style={{ fontSize: 18, padding: 5 }}
-            itemStyle={{ backgroundColor: "white" }}
+            itemStyle={{ height: 140 }}
           >
             {
               categories.map((category, index) => (
@@ -213,10 +214,12 @@ function NewRecipeScreen({ navigation }) {
           />
         </View>
 
-        <Button
-          title="Rezept Hinzufügen"
+        <TouchableOpacity
+          style={styles.addButton}
           onPress={() => handleAddNewRecipe()}
-        />
+          underlayColor='#fff'>
+          <Text style={styles.addButtonText}>Hinzufügen</Text>
+        </TouchableOpacity>
 
         <Dialog
           isVisible={confirmDeleteImageDialogVisible}
@@ -237,6 +240,7 @@ function NewRecipeScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   text: {
+    marginTop: 10,
     fontWeight: "bold",
     fontSize: 20,
     paddingBottom: 3
@@ -246,6 +250,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     borderBottomWidth: 1,
     borderBottomColor: "lightgrey"
+  },
+  addButton: {
+    margin: 10,
+    backgroundColor: '#1E6738',
+    padding: 10
+  },
+  addButtonText: {
+    fontSize: 20,
+    color: '#fff',
+    textAlign: 'center',
   },
 });
 

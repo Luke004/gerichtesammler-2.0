@@ -87,7 +87,7 @@ const HomeScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={{ flex: 1, justifyContent: "flex-start" }}>
+    <View style={{ flex: 1 }}>
       {
         hasNoCategories &&
         <View style={{ display: "flex", flexDirection: "row", padding: 10, alignItems: "center", backgroundColor: "#ebd321" }}>
@@ -104,12 +104,12 @@ const HomeScreen = ({ navigation }) => {
         </Text>
       }
       {
-        hasNoCategories && recipes?.length == 0 && filters.length > 0 &&
+        !hasNoCategories && recipes?.length == 0 && filters.length > 0 &&
         <Text style={{ fontWeight: "bold", textAlign: "center", padding: 10 }}>
           Keine Rezepte unter {filters.length == 1 ? "dem" : "den"} angewandten Filter{filters.length == 1 ? "" : "n"} gefunden!
         </Text>
       }
-      <ScrollView style={{ width: '100%', flexBasis: 0 }}>
+      <ScrollView style={{ flexBasis: 0 }} scrollIndicatorInsets={{ right: 1 }}>
         {
           recipes.map((recipe, index) => (
             <TouchableOpacity key={recipe.recipe_id}

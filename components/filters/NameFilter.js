@@ -11,7 +11,7 @@ export const NameFilter = (props) => {
       <Text>Name</Text>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <TextInput
-          style={{ width: 230, backgroundColor: "white", border: "1px solid black", fontSize: 20, marginRight: 5 }}
+          style={{ width: 230, backgroundColor: "white", borderBottomWidth: 1, borderBottomColor: "lightgrey", fontSize: 20, marginRight: 5 }}
           onChangeText={(value) => setNameFilter(value)}
           onBlur={() => {
             if (nameFilter.replace(/\s/g, '').length) { // whitespace only check

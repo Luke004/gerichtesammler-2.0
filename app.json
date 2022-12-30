@@ -18,7 +18,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.luke04.gerichtesammler"
     },
     "android": {
       "adaptiveIcon": {

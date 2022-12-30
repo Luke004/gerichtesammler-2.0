@@ -75,60 +75,99 @@ function Settings({ navigation }) {
   };
 
   let myFilters = filters.map((item, key) => {
+    const TopFilterSeparator = () => {
+      return (
+        <View>
+          {
+            key == 0 &&
+            <View style={styles.filterSeparator} />
+          }
+        </View>
+      )
+    }
+    const BottomFilterSeparator = () => {
+      return (
+        <View>
+          {
+            key != filters.length - 1 &&
+            <View style={styles.filterSeparator} />
+          }
+        </View>
+      )
+    }
     switch (item.type) {
       case "name":
         return (
-          <NameFilter key={item.id}
-            initialValue={item.value}
-            onBlur={(value) => updateFilter(item.id, "name", value)}
-            onDeletePress={() => handleRemoveFilterPress(item.id)}
-          />
+          <View style={{ width: "100%" }} key={item.id}>
+            <TopFilterSeparator />
+            <NameFilter
+              initialValue={item.value}
+              onBlur={(value) => updateFilter(item.id, "name", value)}
+              onDeletePress={() => handleRemoveFilterPress(item.id)}
+            />
+            <BottomFilterSeparator />
+          </View>
         );
       case "category":
         return (
-          <CategoryFilter key={item.id}
-            initialValue={item.value}
-            onValueChange={(value) => updateFilter(item.id, "category", value)}
-            onDeletePress={() => handleRemoveFilterPress(item.id)}
-          />
+          <View style={{ width: "100%" }} key={item.id}>
+            <TopFilterSeparator />
+            <CategoryFilter key={item.id}
+              initialValue={item.value}
+              onValueChange={(value) => updateFilter(item.id, "category", value)}
+              onDeletePress={() => handleRemoveFilterPress(item.id)}
+            />
+            <BottomFilterSeparator />
+          </View>
         );
       case "rating":
         return (
-          <RatingFilter key={item.id}
-            initialValue={item.value}
-            onValueChange={(value) => updateFilter(item.id, "rating", value)}
-            onDeletePress={() => handleRemoveFilterPress(item.id)}
-          />
+          <View style={{ width: "100%" }} key={item.id}>
+            <TopFilterSeparator />
+            <RatingFilter key={item.id}
+              initialValue={item.value}
+              onValueChange={(value) => updateFilter(item.id, "rating", value)}
+              onDeletePress={() => handleRemoveFilterPress(item.id)}
+            />
+            <BottomFilterSeparator />
+          </View>
         );
       case "last_cooked":
         return (
-          <LastCookedFilter key={item.id}
-            initialValue={item.value}
-            onValueChange={(value) => updateFilter(item.id, "last_cooked", value)}
-            onBlur={(value) => updateFilter(item.id, "last_cooked", value)}
-            onDeletePress={() => handleRemoveFilterPress(item.id)}
-          />
+          <View style={{ width: "100%" }} key={item.id}>
+            <TopFilterSeparator />
+            <LastCookedFilter key={item.id}
+              initialValue={item.value}
+              onValueChange={(value) => updateFilter(item.id, "last_cooked", value)}
+              onBlur={(value) => updateFilter(item.id, "last_cooked", value)}
+              onDeletePress={() => handleRemoveFilterPress(item.id)}
+            />
+            <BottomFilterSeparator />
+          </View>
         );
       case "duration":
         return (
-          <DurationFilter key={item.id}
-            initialValue={item.value}
-            onValueChange={(value) => updateFilter(item.id, "duration", value)}
-            onBlur={(value) => updateFilter(item.id, "duration", value)}
-            onDeletePress={() => handleRemoveFilterPress(item.id)}
-          />
+          <View style={{ width: "100%" }} key={item.id}>
+            <TopFilterSeparator />
+            <DurationFilter key={item.id}
+              initialValue={item.value}
+              onValueChange={(value) => updateFilter(item.id, "duration", value)}
+              onBlur={(value) => updateFilter(item.id, "duration", value)}
+              onDeletePress={() => handleRemoveFilterPress(item.id)}
+            />
+            <BottomFilterSeparator />
+          </View>
         );
     }
   });
 
 
   return (
+    <View style={{ flex: 1 }}>
 
-    <View style={{ width: "100%" }}>
+      <ScrollView scrollIndicatorInsets={{ right: 1 }}>
 
-      <ScrollView>
-
-        <View style={{ width: "100%", alignItems: "center", padding: 30 }}>
+        <View style={{ alignItems: "center", padding: 30 }}>
 
           <TouchableOpacity
             style={styles.editCategoriesButton}
@@ -147,6 +186,7 @@ function Settings({ navigation }) {
               setSortingCriteria(sortingEntryId, SORTING_OPTIONS_DB[itemIndex]);
             }}
             style={styles.picker}
+            itemStyle={{ height: 140 }}
           >
             {
               SORTING_OPTIONS_FRIENDLY.map((sortingOption, index) => (
@@ -165,6 +205,7 @@ function Settings({ navigation }) {
                 setSelectedFilter(itemValue);
               }}
               style={[styles.picker, { marginRight: 5 }]}
+              itemStyle={{ height: 140 }}
             >
               {
                 FILTER_OPTIONS_FRIENDLY.map((filterOption, index) => (
@@ -199,7 +240,11 @@ const styles = StyleSheet.create({
     width: "100%"
   },
   filterSeparator: {
-    width: "30%"
+    alignSelf: "center",
+    borderWidth: 0.5,
+    borderColor: 'lightgrey',
+    marginVertical: 20,
+    width: "40%"
   },
   editCategoriesButton: {
     backgroundColor: '#1E6738',
@@ -212,11 +257,11 @@ const styles = StyleSheet.create({
   },
   picker: {
     width: 230,
-    backgroundColor: "white",
     fontSize: 18,
     padding: 5
   },
   pickerInfoText: {
+    fontWeight: "bold",
     fontSize: 20,
     marginBottom: 5
   }
